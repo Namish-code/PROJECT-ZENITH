@@ -1,0 +1,63 @@
+@import "tailwindcss";
+
+@layer utilities {
+  /* Hard-coding the dark background directly behind the gradient line layers */
+  .bg-scanlines {
+    background-color: #04060b !important;
+    background-image: 
+      linear-gradient(
+        rgba(4, 6, 11, 0.40) 0%, 
+        rgba(4, 6, 11, 0.40) 100%
+      ),
+      url('/space_earth_bg.png'),
+      linear-gradient(
+        rgba(18, 24, 38, 0) 50%, 
+        rgba(6, 182, 212, 0.04) 50%
+      ) !important;
+    background-size: cover, cover, 100% 4px !important;
+    background-position: center bottom, center bottom, top left !important;
+    background-repeat: no-repeat, no-repeat, repeat !important;
+    background-attachment: fixed, fixed, scroll !important;
+  }
+  
+  /* Cyber HUD Border Glows */
+  .shadow-neon-cyan {
+    box-shadow: 0 0 15px rgba(6, 182, 212, 0.15), inset 0 0 10px rgba(6, 182, 212, 0.05) !important;
+  }
+  .shadow-neon-amber {
+    box-shadow: 0 0 15px rgba(245, 158, 11, 0.15), inset 0 0 10px rgba(245, 158, 11, 0.05) !important;
+  }
+
+  .clip-chamfer {
+    clip-path: polygon(
+      0px 10px, 
+      10px 0px, 
+      100% 0px, 
+      100% calc(100% - 10px), 
+      calc(100% - 10px) 100%, 
+      0px 100%
+    );
+  }
+
+  /* Custom range input thumb */
+  input[type="range"].custom-range-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 8px;
+    height: 18px;
+    background: #06b6d4 !important;
+    border: 1px solid #22d3ee;
+    box-shadow: 0 0 8px #06b6d4;
+    cursor: pointer;
+    border-radius: 1px;
+  }
+  input[type="range"].custom-range-slider::-moz-range-thumb {
+    width: 8px;
+    height: 18px;
+    background: #06b6d4 !important;
+    border: 1px solid #22d3ee;
+    box-shadow: 0 0 8px #06b6d4;
+    cursor: pointer;
+    border-radius: 1px;
+  }
+}
