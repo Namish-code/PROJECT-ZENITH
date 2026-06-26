@@ -504,7 +504,7 @@ export default function App() {
       try {
         if (showLoading) setLoading(true);
         const response = await fetch(
-          `http://127.0.0.1:8000/api/v1/zenith-telemetry?lat=${LAT}&lon=${LON}&time_offset_hours=${timeOffset}`
+          `/api/v1/zenith-telemetry?lat=${LAT}&lon=${LON}&time_offset_hours=${timeOffset}`
         );
         if (!response.ok) throw new Error("Ground station data pipeline dropped.");
         const data = await response.json();

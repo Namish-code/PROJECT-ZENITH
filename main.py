@@ -1,8 +1,11 @@
 import math
 from datetime import datetime, timedelta, timezone
+from pathlib import Path
 
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 
 from core_engine import SpaceEngine, detect_conjunctions, generate_sky_story
 from satellite_tracker import NOIDA_GROUND_STATION, fetch_tracked_tles
@@ -93,3 +96,16 @@ async def fetch_dashboard_telemetry(
         "cosmic_objects": cosmic_objects,
         "conjunctions": conjunctions,  # Seamless data mapping connection straight to UI header
     }
+
+
+# --- Serve React Frontend ---
+FRONTEND_DIST = Path(__file__).parent / "frontend" / "dist"
+
+if FRONTEND_DIST.exists():
+    app.mount("/assets", StaticFiles(directory=FRONTEND_DIST / "assets"), name="assets")
+
+    @app.get("/{full_path:path}")
+    async def serve_react(full_path: str):
+        """Catch-all: serve React's index.html for all non-API routes."""
+        index = FRONTEND_DIST / "index.html"
+        return FileResponse(index)

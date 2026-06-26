@@ -55,7 +55,7 @@ export default function TerminalInput({ onComplete, framesLoaded }) {
 
     try {
       // Connect to our telemetry backend to ensure it's up
-      const res = await fetch(`http://127.0.0.1:8000/api/v1/zenith-telemetry?lat=${coords.lat}&lon=${coords.lon}`);
+      const res = await fetch(`/api/v1/zenith-telemetry?lat=${coords.lat}&lon=${coords.lon}`);
       if (!res.ok) throw new Error('Telemetry server error');
       
       setStatus('LINK ESTABLISHED. COMMENCING SPATIAL JUMP.');
