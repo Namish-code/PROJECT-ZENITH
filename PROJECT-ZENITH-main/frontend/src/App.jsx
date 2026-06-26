@@ -664,7 +664,7 @@ export default function App() {
           {/* [02] ZENITH SNAPSHOT */}
           <div className="p-[1.5px] bg-gradient-to-br from-cyan-500/30 to-cyan-500/10 clip-chamfer shadow-lg relative">
             <div className="clip-chamfer bg-black/12 backdrop-blur-sm p-4 flex flex-col h-full w-full">
-              <div className="text-cyan-400 font-black tracking-widest text-[15px] border-b border-cyan-500/20 pb-2 mb-2 flex justify-between items-center">
+              <div className="text-cyan-400 font-black tracking-widest text-[16px] border-b border-cyan-500/20 pb-2 mb-2 flex justify-between items-center">
                 <Tooltip text={TIPS.zenithSnapshot}>
                   <span>[02] ZENITH SNAPSHOT</span>
                 </Tooltip>
@@ -714,8 +714,8 @@ export default function App() {
           <div className="p-[1.5px] bg-gradient-to-br from-cyan-500/30 to-cyan-500/10 clip-chamfer shadow-2xl relative h-fit flex flex-col">
             <div className="clip-chamfer bg-black/5 backdrop-blur-sm p-4 flex flex-col h-fit w-full relative">
               <div className="flex items-center justify-between border-b border-cyan-500/20 pb-2 mb-2">
-                <div className="flex items-center gap-2 text-cyan-400 font-black tracking-widest text-[10px]">
-                  <Compass size={12} />
+                <div className="flex items-center gap-2 text-cyan-400 font-black tracking-widest text-[16px]">
+                  <Compass size={16} />
                   <Tooltip text={TIPS.overheadRadar}>
                     <span>{projectionMode === 'FULL' ? '[04] ZENITH_RADAR_SPHERE' : '[04] OVERHEAD RADAR'}</span>
                   </Tooltip>
@@ -724,7 +724,7 @@ export default function App() {
                   <div className="flex items-center gap-1 bg-black/40 border border-cyan-800/40 p-0.5 rounded-sm select-none">
                     <button
                       onClick={() => setProjectionMode('HALF')}
-                      className={`px-2 py-0.5 text-[8px] font-bold font-mono tracking-wider rounded-sm transition-all duration-150 border cursor-pointer uppercase ${
+                      className={`px-2.5 py-1 text-[12px] font-bold font-mono tracking-wider rounded-sm transition-all duration-150 border cursor-pointer uppercase ${
                         projectionMode === 'HALF'
                           ? 'bg-cyan-950/60 border-cyan-500/30 text-cyan-400 shadow-[0_0_8px_rgba(6,182,212,0.15)] font-black'
                           : 'bg-transparent border-transparent text-cyan-700 hover:text-cyan-500 hover:bg-cyan-950/10'
@@ -734,7 +734,7 @@ export default function App() {
                     </button>
                     <button
                       onClick={() => setProjectionMode('FULL')}
-                      className={`px-2 py-0.5 text-[8px] font-bold font-mono tracking-wider rounded-sm transition-all duration-150 border cursor-pointer uppercase ${
+                      className={`px-2.5 py-1 text-[12px] font-bold font-mono tracking-wider rounded-sm transition-all duration-150 border cursor-pointer uppercase ${
                         projectionMode === 'FULL'
                           ? 'bg-cyan-950/60 border-cyan-500/30 text-cyan-400 shadow-[0_0_8px_rgba(6,182,212,0.15)] font-black'
                           : 'bg-transparent border-transparent text-cyan-700 hover:text-cyan-500 hover:bg-cyan-950/10'
@@ -743,7 +743,7 @@ export default function App() {
                       FULL SPHERE
                     </button>
                   </div>
-                  <span className="text-[9px] bg-cyan-950/80 border border-cyan-800 text-cyan-400 px-2 py-0.5 tracking-widest uppercase font-black">
+                  <span className="text-[12px] bg-cyan-950/80 border border-cyan-800 text-cyan-400 px-2.5 py-1 tracking-widest uppercase font-black rounded-sm">
                     Grid Layer 3D Active
                   </span>
                 </div>
@@ -762,14 +762,14 @@ export default function App() {
 
               {/* [05] TIME MACHINE */}
               <div className="border-t border-cyan-500/20 pt-3 mt-2">
-                <div className="flex justify-between items-center text-[13px] mb-2">
+                <div className="flex justify-between items-center text-[16px] mb-2">
                   <span className="text-cyan-400 flex items-center gap-2 tracking-widest font-black">
-                    <Clock size={13} />
+                    <Clock size={16} />
                     <Tooltip text={TIPS.timeMachine}>
                       <span>[05] TIME MACHINE</span>
                     </Tooltip>
                   </span>
-                  <span className="font-bold font-mono px-2 py-0.5 bg-cyan-950 border border-cyan-800 text-cyan-400 rounded-sm text-[11px]">
+                  <span className="font-bold font-mono px-2.5 py-1 bg-cyan-950 border border-cyan-800 text-cyan-400 rounded-sm text-[13px]">
                     {timeOffset === 0 ? "LIVE_SYNCHRONOUS" : `T_OFFSET: ${timeOffset > 0 ? '+' : ''}${timeOffset}H`}
                   </span>
                 </div>
@@ -788,13 +788,13 @@ export default function App() {
                     step="0.5"
                     value={timeOffset}
                     onChange={(e) => setTimeOffset(parseFloat(e.target.value))}
-                    className="w-full h-[6px] bg-cyan-950/70 border border-cyan-500/30 rounded-sm appearance-none cursor-pointer relative z-10 focus:outline-none custom-range-slider"
+                    className="w-full h-[10px] bg-cyan-950/70 border border-cyan-500/30 rounded-sm appearance-none cursor-pointer relative z-10 focus:outline-none custom-range-slider"
                   />
                 </div>
-                <div className="flex justify-between text-[11px] font-mono mt-2 px-0.5 font-bold">
-                  <span className="bg-black/50 text-cyan-400 px-2 py-0.5 rounded-sm border border-cyan-500/15">PROJECTION_PAST_24H</span>
-                  <span className="bg-black/50 text-cyan-400 px-2 py-0.5 rounded-sm border border-cyan-500/15">SYSTEM_CLOCK_ZERO</span>
-                  <span className="bg-black/50 text-cyan-400 px-2 py-0.5 rounded-sm border border-cyan-500/15">PROJECTION_FUTURE_24H</span>
+                <div className="flex justify-between text-[13px] font-mono mt-2 px-0.5 font-bold">
+                  <span className="bg-black/50 text-cyan-400 px-2.5 py-1 rounded-sm border border-cyan-500/15">PROJECTION_PAST_24H</span>
+                  <span className="bg-black/50 text-cyan-400 px-2.5 py-1 rounded-sm border border-cyan-500/15">SYSTEM_CLOCK_ZERO</span>
+                  <span className="bg-black/50 text-cyan-400 px-2.5 py-1 rounded-sm border border-cyan-500/15">PROJECTION_FUTURE_24H</span>
                 </div>
               </div>
             </div>
@@ -882,9 +882,9 @@ export default function App() {
         <section className="xl:col-span-1 flex flex-col gap-4">
           <div className="p-[1.5px] bg-gradient-to-br from-cyan-500/30 to-cyan-500/10 clip-chamfer shadow-lg relative h-full flex flex-col">
             <div className="clip-chamfer bg-black/12 backdrop-blur-sm p-3 shadow-lg flex flex-col h-full w-full">
-              <div className="flex items-center justify-between border-b border-cyan-500/20 pb-2 mb-3 text-cyan-400 font-black tracking-widest text-[10px]">
+              <div className="flex items-center justify-between border-b border-cyan-500/20 pb-2 mb-3 text-cyan-400 font-black tracking-widest text-[16px]">
                 <div className="flex items-center gap-2">
-                  <Compass size={12} className="animate-pulse" />
+                  <Compass size={16} className="animate-pulse" />
                   <Tooltip text={TIPS.distancePhase}>
                     <span>[06] DISTANCE &amp; PHASE</span>
                   </Tooltip>
@@ -955,7 +955,7 @@ export default function App() {
 
               {/* [07] SUN & SHADOW */}
               <div className="mt-3 pt-3 border-t border-cyan-500/20">
-                <div className="flex items-center justify-between text-cyan-400 text-[15px] font-black tracking-widest mb-2">
+                <div className="flex items-center justify-between text-cyan-400 text-[16px] font-black tracking-widest mb-2">
                   <Tooltip text={TIPS.sunShadow}>
                     <span>[07] SUN &amp; SHADOW</span>
                   </Tooltip>
@@ -975,7 +975,7 @@ export default function App() {
 
               {/* [08] CONJUNCTION ALERTS */}
               <div className="mt-3 pt-3 border-t border-cyan-500/20 flex-1 flex flex-col min-h-[250px]">
-                <div className="flex items-center justify-between text-cyan-400 text-[17px] font-black tracking-widest mb-2">
+                <div className="flex items-center justify-between text-cyan-400 text-[16px] font-black tracking-widest mb-2">
                   <Tooltip text={TIPS.conjunctionAlerts}>
                     <span>[08] CONJUNCTION ALERTS</span>
                   </Tooltip>

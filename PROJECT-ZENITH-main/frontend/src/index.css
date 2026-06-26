@@ -43,21 +43,21 @@
   input[type="range"].custom-range-slider::-webkit-slider-thumb {
     -webkit-appearance: none;
     appearance: none;
-    width: 8px;
-    height: 18px;
+    width: 12px;
+    height: 22px;
     background: #06b6d4 !important;
     border: 1px solid #22d3ee;
     box-shadow: 0 0 8px #06b6d4;
     cursor: pointer;
-    border-radius: 1px;
+    border-radius: 1.5px;
   }
   input[type="range"].custom-range-slider::-moz-range-thumb {
-    width: 8px;
-    height: 18px;
+    width: 12px;
+    height: 22px;
     background: #06b6d4 !important;
     border: 1px solid #22d3ee;
     box-shadow: 0 0 8px #06b6d4;
     cursor: pointer;
-    border-radius: 1px;
+    border-radius: 1.5px;
   }
 }
