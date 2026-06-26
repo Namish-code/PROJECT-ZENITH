@@ -559,6 +559,78 @@ export default function App() {
 
   // --- MODULE RENDER FUNCTIONS ---
   
+  const highlightWords = (text) => {
+    if (!text) return "";
+    const tokens = text.split(/(\s+)/);
+    return tokens.map((token, tIdx) => {
+      const upperToken = token.toUpperCase();
+      const cleanToken = upperToken.replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g,"");
+      
+      // 1. Alert / Critical keywords -> Red text
+      if (cleanToken === "ALERT" || cleanToken === "CRITICAL" || cleanToken === "CONJUNCTION" || cleanToken === "ALIGNMENT") {
+        return <span key={tIdx} className="text-rose-400 font-black text-[16.5px] animate-pulse">{token}</span>;
+      }
+      
+      // 2. Phenomenon / Special keywords -> Emerald text
+      if (cleanToken === "PHENOMENON" || cleanToken === "SHADOW" || cleanToken === "ZERO") {
+        return <span key={tIdx} className="text-emerald-400 font-black text-[16.5px]">{token}</span>;
+      }
+
+      // 3. Space Vessels -> Orange/Purple text
+      if (cleanToken === "ISS") {
+        return <span key={tIdx} className="text-orange-400 font-black text-[16px]">{token}</span>;
+      }
+      if (cleanToken === "CSS" || cleanToken === "TIANGONG" || cleanToken === "TIANHE") {
+        return <span key={tIdx} className="text-purple-400 font-black text-[16px]">{token}</span>;
+      }
+      
+      // 4. Planet / Cosmic names -> Celestial colors
+      if (cleanToken === "MOON") {
+        return <span key={tIdx} className="text-yellow-300 font-black text-[16px]">{token}</span>;
+      }
+      if (cleanToken === "SUN") {
+        return <span key={tIdx} className="text-orange-500 font-black text-[16px]">{token}</span>;
+      }
+      if (cleanToken === "MARS") {
+        return <span key={tIdx} className="text-red-400 font-bold text-[16px]">{token}</span>;
+      }
+      if (["JUPITER", "SATURN", "MERCURY", "URANUS", "NEPTUNE", "VENUS"].includes(cleanToken)) {
+        return <span key={tIdx} className="text-sky-300 font-bold text-[16px]">{token}</span>;
+      }
+      
+      // 5. Positive statuses / nominal keywords -> Emerald text
+      if (["CALM", "NOMINAL", "STEADY", "OK", "CLEAR"].includes(cleanToken)) {
+        return <span key={tIdx} className="text-emerald-400 font-bold text-[15.5px]">{token}</span>;
+      }
+
+      // 6. Vector / Direction / Numeric values -> Amber text
+      if (/^\d+(\.\d+)?$/.test(cleanToken)) {
+        return <span key={tIdx} className="text-amber-400 font-mono font-bold text-[15.5px]">{token}</span>;
+      }
+      if (cleanToken === "ZENITH" || cleanToken === "HORIZON" || cleanToken === "ELEVATION" || cleanToken === "GS_LOC" || cleanToken === "COORD") {
+        return <span key={tIdx} className="text-amber-500 font-bold text-[15.5px]">{token}</span>;
+      }
+      
+      // 7. Muted/Default text token -> High contrast bright white-gray
+      return <span key={tIdx} className="text-gray-100 text-[15px]">{token}</span>;
+    });
+  };
+
+  const renderFormattedStory = (text) => {
+    if (!text) return null;
+    
+    // Split into sentences using a lookbehind to keep the punctuation with the sentence
+    const sentences = text.split(/(?<=\.\s+)/);
+    
+    return sentences.map((sentence, sIdx) => {
+      return (
+        <span key={sIdx} className="inline-block leading-relaxed my-1 mr-1.5">
+          {highlightWords(sentence)}
+        </span>
+      );
+    });
+  };
+
   const renderLiveSkyStory = () => (
     <div className="p-[1.5px] bg-gradient-to-br from-cyan-500/30 to-cyan-500/10 clip-chamfer shadow-lg relative h-[300px]">
       <div className="clip-chamfer bg-black/12 backdrop-blur-sm p-4 flex flex-col h-full w-full relative">
@@ -569,12 +641,12 @@ export default function App() {
             <span>[01] LIVE SKY STORY</span>
           </Tooltip>
         </div>
-        <div className="flex-1 bg-black/8 border border-cyan-900/40 p-3.5 font-mono text-[16px] leading-relaxed text-cyan-300/80 overflow-y-auto custom-scrollbar">
+        <div className="flex-1 bg-black/8 border border-cyan-900/40 p-3.5 font-mono overflow-y-auto custom-scrollbar">
           {loading && !telemetry ? (
-            <div className="text-cyan-600 animate-pulse">Synchronizing terminal matrix arrays...</div>
+            <div className="text-cyan-600 animate-pulse text-[16px]">Synchronizing terminal matrix arrays...</div>
           ) : (
-            <p className="border-l border-cyan-500 pl-2 italic">
-              "{telemetry?.live_sky_story}"
+            <p className="border-l border-cyan-500 pl-2.5 italic">
+              {renderFormattedStory(telemetry?.live_sky_story)}
             </p>
           )}
         </div>
