@@ -116,7 +116,12 @@ async def serve_index():
 
 @app.get("/{full_path:path}")
 async def serve_react(full_path: str):
-    """Catch-all: serve React's index.html for all non-API routes."""
+    """Serve static files if they exist, otherwise serve index.html for React routing."""
+    # Check if the requested file exists in dist
+    file_path = FRONTEND_DIST / full_path
+    if file_path.is_file():
+        return FileResponse(str(file_path))
+        
     index = FRONTEND_DIST / "index.html"
     if index.exists():
         return FileResponse(str(index))
