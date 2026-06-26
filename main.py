@@ -101,11 +101,23 @@ async def fetch_dashboard_telemetry(
 # --- Serve React Frontend ---
 FRONTEND_DIST = Path(__file__).parent / "frontend" / "dist"
 
-if FRONTEND_DIST.exists():
-    app.mount("/assets", StaticFiles(directory=FRONTEND_DIST / "assets"), name="assets")
+# Mount static assets (CSS, JS, images)
+_assets_dir = FRONTEND_DIST / "assets"
+if _assets_dir.exists():
+    app.mount("/assets", StaticFiles(directory=str(_assets_dir)), name="assets")
 
-    @app.get("/{full_path:path}")
-    async def serve_react(full_path: str):
-        """Catch-all: serve React's index.html for all non-API routes."""
-        index = FRONTEND_DIST / "index.html"
-        return FileResponse(index)
+@app.get("/")
+async def serve_index():
+    """Serve the React app root."""
+    index = FRONTEND_DIST / "index.html"
+    if index.exists():
+        return FileResponse(str(index))
+    return {"status": "frontend not built"}
+
+@app.get("/{full_path:path}")
+async def serve_react(full_path: str):
+    """Catch-all: serve React's index.html for all non-API routes."""
+    index = FRONTEND_DIST / "index.html"
+    if index.exists():
+        return FileResponse(str(index))
+    return {"status": "frontend not built", "path": full_path}
