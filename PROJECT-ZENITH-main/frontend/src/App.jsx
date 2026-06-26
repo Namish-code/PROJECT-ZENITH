@@ -6,6 +6,42 @@ import OrbitalDome3D from './OrbitalDome3D';
 import SatelliteCylinder3D from './SatelliteCylinder3D';
 import IntroSequence from './IntroSequence';
 
+
+
+// ─── TOOLTIP COMPONENT ────────────────────────────────────────────────────────
+// Wraps any element. On hover, shows a plain-English explanation above it.
+// Styled to match the existing cyan/dark mission-control aesthetic.
+function Tooltip({ text, children }) {
+  const [visible, setVisible] = useState(false);
+
+  return (
+    <span
+      className="relative inline-flex items-center"
+      onMouseEnter={() => setVisible(true)}
+      onMouseLeave={() => setVisible(false)}
+    >
+      {children}
+      {/* small "?" badge to signal interactivity */}
+      <span className="ml-1.5 inline-flex items-center justify-center w-3.5 h-3.5 rounded-full border border-cyan-500/40 text-cyan-500/60 text-[8px] font-black leading-none cursor-help select-none">
+        ?
+      </span>
+      {visible && (
+        <div
+          className="absolute top-full left-0 mt-2 z-50 w-64 p-3 bg-[#020d14]/95 border border-cyan-500/30 rounded-sm shadow-xl shadow-black/80 backdrop-blur-sm pointer-events-none"
+          style={{ minWidth: '220px' }}
+        >
+          {/* little arrow */}
+          <div className="absolute top-full left-4 w-0 h-0 border-l-4 border-r-4 border-t-4 border-l-transparent border-r-transparent border-t-cyan-500/30" />
+          <p className="text-cyan-100/90 text-[11px] font-sans font-normal leading-relaxed tracking-normal">
+            {text}
+          </p>
+        </div>
+      )}
+    </span>
+  );
+}
+// ─────────────────────────────────────────────────────────────────────────────
+
 // --- SUB-COMPONENT: ROTATING TEXTURE-MAPPED CELESTIAL DISKS ---
 function OrbitalMiniRender({ color, segments, isOverhead, name }) {
   function RotatingMesh() {
@@ -288,19 +324,15 @@ function getLocationName(lat, lon) {
 
 // Helper to estimate timezone offsets based on latitude/longitude
 function getTargetTimezoneOffset(lat, lon) {
-  // Exact offsets (political + DST in June 2026) for major preset cities
-  if (Math.abs(lat - 28.53) < 1 && Math.abs(lon - 77.39) < 1) return 5.5; // Noida/Delhi (IST: UTC+5:30)
-  if (Math.abs(lat - 48.8566) < 1 && Math.abs(lon - 2.3522) < 1) return 2.0; // Paris (CEST: UTC+2)
-  if (Math.abs(lat - 51.5074) < 1 && Math.abs(lon - 0) < 1) return 1.0; // London (BST: UTC+1)
-  if (Math.abs(lat - 40.7128) < 1 && Math.abs(lon - (-74.0060)) < 1) return -4.0; // New York (EDT: UTC-4)
-  if (Math.abs(lat - 35.6762) < 1 && Math.abs(lon - 139.6503) < 1) return 9.0; // Tokyo (JST: UTC+9)
-  if (Math.abs(lat - (-33.8688)) < 1 && Math.abs(lon - 151.2093) < 1) return 10.0; // Sydney (AEST: UTC+10)
-
-  // Fallback to standard geographic offset (15 degrees longitude = 1 hour offset)
+  if (Math.abs(lat - 28.53) < 1 && Math.abs(lon - 77.39) < 1) return 5.5;
+  if (Math.abs(lat - 48.8566) < 1 && Math.abs(lon - 2.3522) < 1) return 2.0;
+  if (Math.abs(lat - 51.5074) < 1 && Math.abs(lon - 0) < 1) return 1.0;
+  if (Math.abs(lat - 40.7128) < 1 && Math.abs(lon - (-74.0060)) < 1) return -4.0;
+  if (Math.abs(lat - 35.6762) < 1 && Math.abs(lon - 139.6503) < 1) return 9.0;
+  if (Math.abs(lat - (-33.8688)) < 1 && Math.abs(lon - 151.2093) < 1) return 10.0;
   return Math.round((lon / 15.0) * 2) / 2;
 }
 
-// Helper to retrieve user-friendly location name based on coordinates
 function getSatelliteSummary(name) {
   const n = name.toUpperCase();
   
@@ -417,16 +449,34 @@ function getSatelliteSummary(name) {
   };
 }
 
+// ─── TOOLTIP TEXT DEFINITIONS ─────────────────────────────────────────────────
+const TIPS = {
+  liveSkyStory:
+    "A plain-English description of what's happening in the sky above your chosen location right now — updated live as satellites and planets move.",
+  zenithSnapshot:
+    "A quick summary of the objects currently visible above you: how many, which one is closest, how far away it is, and which direction to look.",
+  satelliteTracker:
+    "A live list of satellites passing through the sky above you. Tap any satellite to see its 3D shape, who built it, and what it's used for.",
+  overheadRadar:
+    "A radar-style map of your sky viewed from above. The centre is directly overhead (your zenith). Objects near the centre are almost straight above you; objects near the edge are low on the horizon.",
+  timeMachine:
+    "Drag the slider left to see the sky as it was up to 24 hours ago, or right to preview what will be overhead up to 24 hours from now.",
+  distancePhase:
+    "Shows every planet, the Moon, and the Sun — how far away each one is and whether it's currently above your horizon or hidden below it.",
+  sunShadow:
+    "Tracks the Sun's angle in your sky. Near the equator, it shows the exact date when the Sun is so directly overhead that objects cast almost no shadow at all.",
+  conjunctionAlerts:
+    "Automatically detects rare moments when two or more space objects (like the ISS and a planet) are nearly overhead at the same time — a special event worth looking up for.",
+};
+// ─────────────────────────────────────────────────────────────────────────────
+
 // --- MAIN MASTER COMMAND CONTROL DECK ---
 export default function App() {
-  // Global coordinate state
   const [coords, setCoords] = useState({ lat: 40.7128, lon: -74.0060 });
   const [showIntro, setShowIntro] = useState(true);
 
-  // Destructure for internal use
   const { lat: LAT, lon: LON } = coords;
 
-  // --- STATE LAYER ---
   const [telemetry, setTelemetry] = useState(null);
   const [timeOffset, setTimeOffset] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -435,31 +485,21 @@ export default function App() {
   const [clocks, setClocks] = useState({ sysTime: '00:00:00', locTime: '00:00:00' });
   const [selectedSatId, setSelectedSatId] = useState(null);
 
-  // Clocks updating loop
   useEffect(() => {
     function updateClocks() {
       const now = new Date();
-      // Local system time
       const sysTimeStr = now.toLocaleTimeString('en-US', { hour12: false });
-      
-      // Target location local time
       const utcTime = now.getTime() + now.getTimezoneOffset() * 60000;
       const targetOffset = getTargetTimezoneOffset(LAT, LON);
       const targetTime = new Date(utcTime + 3600000 * targetOffset);
       const locTimeStr = targetTime.toLocaleTimeString('en-US', { hour12: false });
-
-      setClocks({
-        sysTime: sysTimeStr,
-        locTime: locTimeStr
-      });
+      setClocks({ sysTime: sysTimeStr, locTime: locTimeStr });
     }
-
     updateClocks();
     const interval = setInterval(updateClocks, 1000);
     return () => clearInterval(interval);
   }, [LAT, LON]);
 
-  // --- DATA FETCH ENGINE ---
   useEffect(() => {
     async function fetchSpaceData(showLoading = true) {
       try {
@@ -478,37 +518,29 @@ export default function App() {
       }
     }
 
-    const delayDebounce = setTimeout(() => {
-      fetchSpaceData(true);
-    }, 150);
-
+    const delayDebounce = setTimeout(() => { fetchSpaceData(true); }, 150);
     let pollInterval = null;
     if (timeOffset === 0) {
-      pollInterval = setInterval(() => {
-        fetchSpaceData(false);
-      }, 5000);
+      pollInterval = setInterval(() => { fetchSpaceData(false); }, 5000);
     }
-
     return () => {
       clearTimeout(delayDebounce);
       if (pollInterval) clearInterval(pollInterval);
     };
   }, [timeOffset, LAT, LON]);
 
-  // Live calculations for Active Sector & Zero Shadow modules
   const visibleSats = telemetry?.satellites?.filter(s => s.is_visible) || [];
-  const closestSat = visibleSats.length > 0 
-    ? visibleSats.reduce((prev, curr) => (prev.range_km < curr.range_km ? prev : curr)) 
+  const closestSat = visibleSats.length > 0
+    ? visibleSats.reduce((prev, curr) => (prev.range_km < curr.range_km ? prev : curr))
     : null;
 
-  const activeSat = telemetry?.satellites?.find(s => s.id === selectedSatId) 
-    || closestSat 
+  const activeSat = telemetry?.satellites?.find(s => s.id === selectedSatId)
+    || closestSat
     || (telemetry?.satellites?.length > 0 ? telemetry.satellites[0] : null);
 
   const satInfo = activeSat ? getSatelliteSummary(activeSat.name) : null;
   const isCurrentlyPassing = activeSat ? activeSat.is_visible : false;
 
-  // Space Station Transit Alerts (ISS, TIANGONG, CSS with elevation > 10)
   const activeTransits = telemetry?.satellites?.filter(s => {
     const n = s.name.toUpperCase();
     const isStation = n.includes('ISS') || n.includes('CSS') || n.includes('TIANHE') || n.includes('TIANGONG');
@@ -526,21 +558,19 @@ export default function App() {
     shadowRatioText = ratio < 0.01 ? "0.00 (ZERO SHADOW)" : `${ratio.toFixed(2)}x`;
   }
 
-return (
+  return (
     <>
       {showIntro && (
-        <IntroSequence 
-          onIntroComplete={() => setShowIntro(false)} 
-          onCoordinatesSet={(c) => setCoords(c)} 
+        <IntroSequence
+          onIntroComplete={() => setShowIntro(false)}
+          onCoordinatesSet={(c) => setCoords(c)}
         />
       )}
       <div className="min-h-screen bg-scanlines text-gray-300 font-mono text-[11px] p-3 overflow-x-hidden select-none relative">
-        {/* Absolute background radar vignette overlay */}
         <div className="absolute inset-0 bg-radial-gradient from-transparent via-[#04060b]/60 to-[#020306] pointer-events-none z-0"></div>
 
       {/* 1. TOP TACTICAL INSTRUMENT BAR */}
       <header className="relative z-10 border border-cyan-500/30 bg-black/15 backdrop-blur-sm mb-4 rounded-sm shadow-md shadow-black/80 grid grid-cols-1 lg:grid-cols-5 divide-y lg:divide-y-0 lg:divide-x divide-cyan-500/20 text-[13px]">
-        {/* Segment A: Station Call Sign */}
         <div className="p-3.5 flex items-center justify-between bg-cyan-500/5">
           <div className="flex items-center gap-2.5">
             <span className="relative flex h-2 w-2">
@@ -552,12 +582,9 @@ return (
           <span className="text-cyan-600/60 font-bold">LST-4.02</span>
         </div>
 
-        {/* Segment B: Live Ticker & Transit Alerts */}
         <div className="p-3.5 lg:col-span-2 flex items-center justify-between gap-3 overflow-hidden bg-amber-500/5">
           <div className="flex items-center gap-3 truncate">
-            <span className="text-amber-500 font-black tracking-widest shrink-0 animate-pulse">
-              [ALERT_LOG]:
-            </span>
+            <span className="text-amber-500 font-black tracking-widest shrink-0 animate-pulse">[ALERT_LOG]:</span>
             <div className="text-amber-300 tracking-wide truncate uppercase font-medium">
               {telemetry?.conjunctions && telemetry.conjunctions.length > 0 ? (
                 <span className="animate-pulse">
@@ -575,7 +602,7 @@ return (
             </div>
           )}
         </div>
-        {/* Segment C: Station Coordinates */}
+
         <div className="p-3.5 flex items-center justify-between text-cyan-500/70">
           <div className="flex flex-col gap-1 font-bold tracking-wider leading-tight">
             <div className="flex items-center gap-1.5 text-cyan-400 text-[14px]">
@@ -592,7 +619,6 @@ return (
           </div>
         </div>
 
-        {/* Segment D: Clocks */}
         <div className="p-3.5 flex items-center justify-between text-cyan-400 font-bold bg-cyan-500/5">
           <div className="flex flex-col gap-1.5 w-full font-mono text-[12.5px] leading-none justify-center">
             <div className="flex justify-between items-center">
@@ -610,196 +636,197 @@ return (
       {/* 2. CORE MASTER CONTROL LAYOUT MATRIX */}
       <main className="relative z-10 grid grid-cols-1 xl:grid-cols-4 gap-4 items-stretch">
         
-        {/* LEFT COMPASS DECK: LIVE DATA LOGS & 3D CYLINDER SCANNER */}
+        {/* LEFT COMPASS DECK */}
         <section className="xl:col-span-1 flex flex-col gap-4">
-          {/* LIVE DATA STREAM LOGS */}
+
+          {/* [01] LIVE SKY STORY */}
           <div className="p-[1.5px] bg-gradient-to-br from-cyan-500/30 to-cyan-500/10 clip-chamfer shadow-lg relative h-[300px]">
             <div className="clip-chamfer bg-black/12 backdrop-blur-sm p-4 flex flex-col h-full w-full relative">
-            <div className="absolute top-0 left-4 right-4 h-px bg-gradient-to-r from-transparent via-cyan-500/30 to-transparent"></div>
-            <div className="flex items-center gap-2 border-b border-cyan-500/20 pb-2 mb-2 text-cyan-400 font-black tracking-widest text-[16px]">
-              <Radio size={14} className="animate-pulse" />
-              <span>[01] // TELEMETRY_STREAM</span>
-            </div>
-            <div className="flex-1 bg-black/8 border border-cyan-900/40 p-3.5 font-mono text-[16px] leading-relaxed text-cyan-300/80 overflow-y-auto custom-scrollbar">
-              {loading && !telemetry ? (
-                <div className="text-cyan-600 animate-pulse">Synchronizing terminal matrix arrays...</div>
-              ) : (
-                <p className="border-l border-cyan-500 pl-2 italic">
-                  "{telemetry?.live_sky_story}"
-                </p>
-              )}
+              <div className="absolute top-0 left-4 right-4 h-px bg-gradient-to-r from-transparent via-cyan-500/30 to-transparent"></div>
+              <div className="flex items-center gap-2 border-b border-cyan-500/20 pb-2 mb-2 text-cyan-400 font-black tracking-widest text-[16px]">
+                <Radio size={14} className="animate-pulse" />
+                <Tooltip text={TIPS.liveSkyStory}>
+                  <span>[01] LIVE SKY STORY</span>
+                </Tooltip>
+              </div>
+              <div className="flex-1 bg-black/8 border border-cyan-900/40 p-3.5 font-mono text-[16px] leading-relaxed text-cyan-300/80 overflow-y-auto custom-scrollbar">
+                {loading && !telemetry ? (
+                  <div className="text-cyan-600 animate-pulse">Synchronizing terminal matrix arrays...</div>
+                ) : (
+                  <p className="border-l border-cyan-500 pl-2 italic">
+                    "{telemetry?.live_sky_story}"
+                  </p>
+                )}
+              </div>
             </div>
           </div>
-        </div>
 
-          {/* ACTIVE SECTOR READOUT */}
+          {/* [02] ZENITH SNAPSHOT */}
           <div className="p-[1.5px] bg-gradient-to-br from-cyan-500/30 to-cyan-500/10 clip-chamfer shadow-lg relative">
             <div className="clip-chamfer bg-black/12 backdrop-blur-sm p-4 flex flex-col h-full w-full">
-            <div className="text-cyan-400 font-black tracking-widest text-[15px] border-b border-cyan-500/20 pb-2 mb-2 flex justify-between items-center">
-              <span>[02] // ACTIVE_SECTOR_TRACKING</span>
-              {activeTransits.length > 0 && (
-                <span className="text-[10px] px-1.5 py-0.5 bg-rose-950/80 border border-rose-500 text-rose-400 animate-pulse font-black rounded-sm">
-                  PASS ACTIVE: {activeTransits[0].name.replace(" (ZARYA)", "").toUpperCase()}
-                </span>
-              )}
+              <div className="text-cyan-400 font-black tracking-widest text-[15px] border-b border-cyan-500/20 pb-2 mb-2 flex justify-between items-center">
+                <Tooltip text={TIPS.zenithSnapshot}>
+                  <span>[02] ZENITH SNAPSHOT</span>
+                </Tooltip>
+                {activeTransits.length > 0 && (
+                  <span className="text-[10px] px-1.5 py-0.5 bg-rose-950/80 border border-rose-500 text-rose-400 animate-pulse font-black rounded-sm">
+                    PASS ACTIVE: {activeTransits[0].name.replace(" (ZARYA)", "").toUpperCase()}
+                  </span>
+                )}
+              </div>
+              <div className="grid grid-cols-2 gap-y-2.5 gap-x-3 text-[13.5px] font-mono tracking-wider text-gray-400">
+                <div className="text-cyan-300 font-bold">VISIBLE TARGETS:</div>
+                <div className="text-right font-black text-cyan-400">{visibleSats.length} ACTIVE</div>
+                <div className="text-cyan-300 font-bold">CLOSEST CONTACT:</div>
+                <div className="text-right font-black text-gray-200 truncate">{closestSat ? closestSat.name : "NONE IN SECTOR"}</div>
+                <div className="text-cyan-300 font-bold">RANGE TO TARGET:</div>
+                <div className="text-right font-black text-gray-200">{closestSat ? `${Math.round(closestSat.range_km).toLocaleString()} KM` : "N/A"}</div>
+                <div className="text-cyan-300 font-bold">TRACKING VECTOR:</div>
+                <div className="text-right font-black text-amber-500">{closestSat ? `${closestSat.azimuth.toFixed(1)}° AZ / ${closestSat.elevation.toFixed(1)}° EL` : "N/A"}</div>
+              </div>
+              <LiveSignalWaveform />
             </div>
-            <div className="grid grid-cols-2 gap-y-2.5 gap-x-3 text-[13.5px] font-mono tracking-wider text-gray-400">
-              <div className="text-cyan-300 font-bold">VISIBLE TARGETS:</div>
-              <div className="text-right font-black text-cyan-400">{visibleSats.length} ACTIVE</div>
-              <div className="text-cyan-300 font-bold">CLOSEST CONTACT:</div>
-              <div className="text-right font-black text-gray-200 truncate">{closestSat ? closestSat.name : "NONE IN SECTOR"}</div>
-              <div className="text-cyan-300 font-bold">RANGE TO TARGET:</div>
-              <div className="text-right font-black text-gray-200">{closestSat ? `${Math.round(closestSat.range_km).toLocaleString()} KM` : "N/A"}</div>
-              <div className="text-cyan-300 font-bold">TRACKING VECTOR:</div>
-              <div className="text-right font-black text-amber-500">{closestSat ? `${closestSat.azimuth.toFixed(1)}° AZ / ${closestSat.elevation.toFixed(1)}° EL` : "N/A"}</div>
-            </div>
-            <LiveSignalWaveform />
           </div>
-        </div>
 
-          {/* SATELLITE CYLINDER SCANNER */}
+          {/* [03] SATELLITE TRACKER */}
           <div className="p-[1.5px] bg-gradient-to-br from-cyan-500/30 to-cyan-500/10 clip-chamfer shadow-lg relative flex flex-col h-fit">
             <div className="clip-chamfer bg-black/12 backdrop-blur-sm p-4 flex flex-col w-full h-fit">
-            <div className="flex items-center gap-2 border-b border-cyan-500/20 pb-2 mb-2 text-cyan-400 font-black tracking-widest text-[16px]">
-              <Orbit size={14} className="text-orange-500 animate-spin" style={{ animationDuration: '6s' }} />
-              <span>[03] // LOW_EARTH_ALTITUDE_CHAMBER</span>
-            </div>
+              <div className="flex items-center gap-2 border-b border-cyan-500/20 pb-2 mb-2 text-cyan-400 font-black tracking-widest text-[16px]">
+                <Orbit size={14} className="text-orange-500 animate-spin" style={{ animationDuration: '6s' }} />
+                <Tooltip text={TIPS.satelliteTracker}>
+                  <span>[03] SATELLITE TRACKER</span>
+                </Tooltip>
+              </div>
               <div className="bg-black/40 border border-cyan-900/20 p-2 rounded-sm h-[650px] flex flex-col">
-                <SatelliteCylinder3D 
-                  telemetry={telemetry} 
-                  loading={loading} 
+                <SatelliteCylinder3D
+                  telemetry={telemetry}
+                  loading={loading}
                   selectedSatId={selectedSatId}
                   onSelectSatellite={setSelectedSatId}
                 />
               </div>
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-        {/* CENTER RADAR quadrants DECK (MAKES IT MASSIVE) */}
+        {/* CENTER DECK */}
         <section className="xl:col-span-2 flex flex-col gap-4">
           <div className="p-[1.5px] bg-gradient-to-br from-cyan-500/30 to-cyan-500/10 clip-chamfer shadow-2xl relative h-fit flex flex-col">
             <div className="clip-chamfer bg-black/5 backdrop-blur-sm p-4 flex flex-col h-fit w-full relative">
-            <div className="flex items-center justify-between border-b border-cyan-500/20 pb-2 mb-2">
-              <div className="flex items-center gap-2 text-cyan-400 font-black tracking-widest text-[10px]">
-                <Compass size={12} />
-                <span>{projectionMode === 'FULL' ? '[04] // ZENITH_RADAR_SPHERE' : '[04] // ZENITH_RADAR_HEMISPHERE'}</span>
-              </div>
-              
-              <div className="flex items-center gap-3">
-                {/* Holographic Projection Mode Toggle */}
-                <div className="flex items-center gap-1 bg-black/40 border border-cyan-800/40 p-0.5 rounded-sm select-none">
-                  <button
-                    onClick={() => setProjectionMode('HALF')}
-                    className={`px-2 py-0.5 text-[8px] font-bold font-mono tracking-wider rounded-sm transition-all duration-150 border cursor-pointer uppercase ${
-                      projectionMode === 'HALF'
-                        ? 'bg-cyan-950/60 border-cyan-500/30 text-cyan-400 shadow-[0_0_8px_rgba(6,182,212,0.15)] font-black'
-                        : 'bg-transparent border-transparent text-cyan-700 hover:text-cyan-500 hover:bg-cyan-950/10'
-                    }`}
-                  >
-                    HALF DOME
-                  </button>
-                  <button
-                    onClick={() => setProjectionMode('FULL')}
-                    className={`px-2 py-0.5 text-[8px] font-bold font-mono tracking-wider rounded-sm transition-all duration-150 border cursor-pointer uppercase ${
-                      projectionMode === 'FULL'
-                        ? 'bg-cyan-950/60 border-cyan-500/30 text-cyan-400 shadow-[0_0_8px_rgba(6,182,212,0.15)] font-black'
-                        : 'bg-transparent border-transparent text-cyan-700 hover:text-cyan-500 hover:bg-cyan-950/10'
-                    }`}
-                  >
-                    FULL SPHERE
-                  </button>
+              <div className="flex items-center justify-between border-b border-cyan-500/20 pb-2 mb-2">
+                <div className="flex items-center gap-2 text-cyan-400 font-black tracking-widest text-[10px]">
+                  <Compass size={12} />
+                  <Tooltip text={TIPS.overheadRadar}>
+                    <span>{projectionMode === 'FULL' ? '[04] ZENITH_RADAR_SPHERE' : '[04] OVERHEAD RADAR'}</span>
+                  </Tooltip>
                 </div>
-                
-                <span className="text-[9px] bg-cyan-950/80 border border-cyan-800 text-cyan-400 px-2 py-0.5 tracking-widest uppercase font-black">
-                  Grid Layer 3D Active
-                </span>
-              </div>
-            </div>
-
-            {/* RADAR CONTAINER */}
-            <div className="flex-1 flex items-center justify-center p-4 relative min-h-[700px]">
-              <OrbitalDome3D 
-                telemetry={telemetry} 
-                loading={loading} 
-                timeOffset={timeOffset} 
-                projectionMode={projectionMode} 
-                selectedSatId={selectedSatId}
-                onSelectSatellite={setSelectedSatId}
-              />
-            </div>
-
-            {/* TEMPORAL MACHINE CONTROLLERS */}
-            <div className="border-t border-cyan-500/20 pt-3 mt-2">
-              <div className="flex justify-between items-center text-[13px] mb-2">
-                <span className="text-cyan-400 flex items-center gap-2 tracking-widest font-black">
-                  <Clock size={13} /> [05] // CHRONO_TEMPORAL_PROJECTION
-                </span>
-                <span className="font-bold font-mono px-2 py-0.5 bg-cyan-950 border border-cyan-800 text-cyan-400 rounded-sm text-[11px]">
-                  {timeOffset === 0 ? "LIVE_SYNCHRONOUS" : `T_OFFSET: ${timeOffset > 0 ? '+' : ''}${timeOffset}H`}
-                </span>
-              </div>
-              <div className="relative w-full h-8 flex items-center mt-2 mb-2">
-                {/* Symmetrical Waveform */}
-                <div className="absolute inset-0 flex items-center justify-center opacity-85 pointer-events-none">
-                  <svg viewBox="0 0 400 30" className="w-full h-full text-cyan-400 fill-none stroke-current stroke-[1.5]">
-                    <path d="M 0 15 Q 100 15 150 15 T 190 15 Q 200 2 210 15 T 220 15 Q 230 28 240 15 T 250 15 T 300 15 T 400 15" />
-                    <path d="M 0 15 Q 80 15 140 15 T 180 15 Q 200 5 210 15 T 220 25 T 230 15 Q 250 5 260 15 T 320 15 T 400 15" className="opacity-75" strokeDasharray="3 3" />
-                    <path d="M 0 15 Q 100 15 150 15 T 190 15 Q 200 28 210 15 T 220 15 Q 230 2 240 15 T 250 15 T 300 15 T 400 15" className="opacity-70" />
-                  </svg>
+                <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-1 bg-black/40 border border-cyan-800/40 p-0.5 rounded-sm select-none">
+                    <button
+                      onClick={() => setProjectionMode('HALF')}
+                      className={`px-2 py-0.5 text-[8px] font-bold font-mono tracking-wider rounded-sm transition-all duration-150 border cursor-pointer uppercase ${
+                        projectionMode === 'HALF'
+                          ? 'bg-cyan-950/60 border-cyan-500/30 text-cyan-400 shadow-[0_0_8px_rgba(6,182,212,0.15)] font-black'
+                          : 'bg-transparent border-transparent text-cyan-700 hover:text-cyan-500 hover:bg-cyan-950/10'
+                      }`}
+                    >
+                      HALF DOME
+                    </button>
+                    <button
+                      onClick={() => setProjectionMode('FULL')}
+                      className={`px-2 py-0.5 text-[8px] font-bold font-mono tracking-wider rounded-sm transition-all duration-150 border cursor-pointer uppercase ${
+                        projectionMode === 'FULL'
+                          ? 'bg-cyan-950/60 border-cyan-500/30 text-cyan-400 shadow-[0_0_8px_rgba(6,182,212,0.15)] font-black'
+                          : 'bg-transparent border-transparent text-cyan-700 hover:text-cyan-500 hover:bg-cyan-950/10'
+                      }`}
+                    >
+                      FULL SPHERE
+                    </button>
+                  </div>
+                  <span className="text-[9px] bg-cyan-950/80 border border-cyan-800 text-cyan-400 px-2 py-0.5 tracking-widest uppercase font-black">
+                    Grid Layer 3D Active
+                  </span>
                 </div>
-                
-                <input
-                  type="range"
-                  min="-24"
-                  max="24"
-                  step="0.5"
-                  value={timeOffset}
-                  onChange={(e) => setTimeOffset(parseFloat(e.target.value))}
-                  className="w-full h-[6px] bg-cyan-950/70 border border-cyan-500/30 rounded-sm appearance-none cursor-pointer relative z-10 focus:outline-none custom-range-slider"
+              </div>
+
+              <div className="flex-1 flex items-center justify-center p-4 relative min-h-[700px]">
+                <OrbitalDome3D
+                  telemetry={telemetry}
+                  loading={loading}
+                  timeOffset={timeOffset}
+                  projectionMode={projectionMode}
+                  selectedSatId={selectedSatId}
+                  onSelectSatellite={setSelectedSatId}
                 />
               </div>
-              <div className="flex justify-between text-[11px] font-mono mt-2 px-0.5 font-bold">
-                <span className="bg-black/50 text-cyan-400 px-2 py-0.5 rounded-sm border border-cyan-500/15">PROJECTION_PAST_24H</span>
-                <span className="bg-black/50 text-cyan-400 px-2 py-0.5 rounded-sm border border-cyan-500/15">SYSTEM_CLOCK_ZERO</span>
-                <span className="bg-black/50 text-cyan-400 px-2 py-0.5 rounded-sm border border-cyan-500/15">PROJECTION_FUTURE_24H</span>
+
+              {/* [05] TIME MACHINE */}
+              <div className="border-t border-cyan-500/20 pt-3 mt-2">
+                <div className="flex justify-between items-center text-[13px] mb-2">
+                  <span className="text-cyan-400 flex items-center gap-2 tracking-widest font-black">
+                    <Clock size={13} />
+                    <Tooltip text={TIPS.timeMachine}>
+                      <span>[05] TIME MACHINE</span>
+                    </Tooltip>
+                  </span>
+                  <span className="font-bold font-mono px-2 py-0.5 bg-cyan-950 border border-cyan-800 text-cyan-400 rounded-sm text-[11px]">
+                    {timeOffset === 0 ? "LIVE_SYNCHRONOUS" : `T_OFFSET: ${timeOffset > 0 ? '+' : ''}${timeOffset}H`}
+                  </span>
+                </div>
+                <div className="relative w-full h-8 flex items-center mt-2 mb-2">
+                  <div className="absolute inset-0 flex items-center justify-center opacity-85 pointer-events-none">
+                    <svg viewBox="0 0 400 30" className="w-full h-full text-cyan-400 fill-none stroke-current stroke-[1.5]">
+                      <path d="M 0 15 Q 100 15 150 15 T 190 15 Q 200 2 210 15 T 220 15 Q 230 28 240 15 T 250 15 T 300 15 T 400 15" />
+                      <path d="M 0 15 Q 80 15 140 15 T 180 15 Q 200 5 210 15 T 220 25 T 230 15 Q 250 5 260 15 T 320 15 T 400 15" className="opacity-75" strokeDasharray="3 3" />
+                      <path d="M 0 15 Q 100 15 150 15 T 190 15 Q 200 28 210 15 T 220 15 Q 230 2 240 15 T 250 15 T 300 15 T 400 15" className="opacity-70" />
+                    </svg>
+                  </div>
+                  <input
+                    type="range"
+                    min="-24"
+                    max="24"
+                    step="0.5"
+                    value={timeOffset}
+                    onChange={(e) => setTimeOffset(parseFloat(e.target.value))}
+                    className="w-full h-[6px] bg-cyan-950/70 border border-cyan-500/30 rounded-sm appearance-none cursor-pointer relative z-10 focus:outline-none custom-range-slider"
+                  />
+                </div>
+                <div className="flex justify-between text-[11px] font-mono mt-2 px-0.5 font-bold">
+                  <span className="bg-black/50 text-cyan-400 px-2 py-0.5 rounded-sm border border-cyan-500/15">PROJECTION_PAST_24H</span>
+                  <span className="bg-black/50 text-cyan-400 px-2 py-0.5 rounded-sm border border-cyan-500/15">SYSTEM_CLOCK_ZERO</span>
+                  <span className="bg-black/50 text-cyan-400 px-2 py-0.5 rounded-sm border border-cyan-500/15">PROJECTION_FUTURE_24H</span>
+                </div>
               </div>
             </div>
           </div>
-        </div>
 
-          {/* TARGET INTELLIGENCE PROFILE DECK */}
+          {/* TARGET INTELLIGENCE PROFILE */}
           <div className="p-[1.5px] bg-gradient-to-br from-cyan-500/30 to-cyan-500/10 clip-chamfer shadow-lg relative mt-4">
             <div className="clip-chamfer bg-black/60 backdrop-blur-md p-6 flex flex-col w-full min-h-[340px]">
               <div className="flex items-center justify-between border-b border-cyan-500/20 pb-3 mb-4.5 text-cyan-400 font-black tracking-widest text-[17px]">
                 <div className="flex items-center gap-2">
                   <Radio size={16} className="animate-pulse text-amber-500" />
-                  <span>[05-B] // TARGET_INTELLIGENCE_PROFILE</span>
+                  <span>[05-B] TARGET_INTELLIGENCE_PROFILE</span>
                 </div>
                 <span className="text-[13.5px] text-cyan-600/80 font-black">DEEP_SPACE_INTEL</span>
               </div>
 
               {activeSat ? (
                 <div className="grid grid-cols-1 md:grid-cols-5 gap-6 items-stretch">
-                  {/* Left Column: Tactical Schematic Grid */}
                   <div className="md:col-span-2 flex flex-col items-center justify-between bg-black/45 border border-cyan-900/40 p-3 rounded-sm relative overflow-hidden min-h-[215px] h-full select-none">
                     <div className="absolute inset-0 bg-scanlines opacity-15 pointer-events-none"></div>
-                    
-                    {/* Holographic 3D Wireframe Viewer */}
                     <div className="w-full flex-1 relative min-h-0">
                       <Canvas camera={{ position: [0, 0, 2.5], fov: 45 }}>
                         <ambientLight intensity={1.5} />
-                        <SatelliteHologram 
-                          name={activeSat.name} 
-                          color={isCurrentlyPassing ? (activeSat.name.toUpperCase().includes('ISS') ? '#f97316' : '#22d3ee') : '#fbbf24'} 
+                        <SatelliteHologram
+                          name={activeSat.name}
+                          color={isCurrentlyPassing ? (activeSat.name.toUpperCase().includes('ISS') ? '#f97316' : '#22d3ee') : '#fbbf24'}
                         />
                       </Canvas>
-                      {/* Decorative HUD crosshair rings overlay */}
                       <div className="absolute inset-0 border border-cyan-500/10 rounded-full scale-[0.8] pointer-events-none flex items-center justify-center">
                         <div className="w-2/3 h-2/3 border border-dashed border-cyan-500/5 rounded-full"></div>
                       </div>
                     </div>
-
                     <div className="w-full flex flex-col items-center gap-1 border-t border-cyan-950/40 pt-1.5 relative z-10 shrink-0">
                       <span className="text-[10.5px] text-cyan-500/80 font-black tracking-widest uppercase leading-none">
                         {activeSat.name.toUpperCase().includes("ISS") ? "ORBITAL_HABITAT" : activeSat.name.toUpperCase().includes("R/B") ? "SPACE_DEBRIS" : activeSat.name.toUpperCase().includes("STARLINK") ? "COMMS_ARRAY" : "LEO_PAYLOAD"}
@@ -812,26 +839,20 @@ return (
                     </div>
                   </div>
 
-                  {/* Right Column: Information fields */}
                   <div className="md:col-span-3 flex flex-col justify-between space-y-4">
                     <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 border-b border-cyan-950 pb-2">
                       <div className="flex flex-col">
-                        <span className="text-[27px] font-black text-white tracking-wider leading-none uppercase">
-                          {activeSat.name}
-                        </span>
-                        <span className="text-[14px] text-cyan-500 font-bold tracking-widest mt-2">
-                          NORAD_ID: {activeSat.id}
-                        </span>
+                        <span className="text-[27px] font-black text-white tracking-wider leading-none uppercase">{activeSat.name}</span>
+                        <span className="text-[14px] text-cyan-500 font-bold tracking-widest mt-2">NORAD_ID: {activeSat.id}</span>
                       </div>
                       <span className={`px-3 py-1.5 text-[13px] font-black rounded-sm border ${
-                        isCurrentlyPassing 
-                          ? 'bg-emerald-950/70 text-emerald-400 border-emerald-500/40 animate-pulse' 
+                        isCurrentlyPassing
+                          ? 'bg-emerald-950/70 text-emerald-400 border-emerald-500/40 animate-pulse'
                           : 'bg-slate-950/80 text-slate-500 border-slate-800'
                       }`}>
                         {isCurrentlyPassing ? 'PASSING OVERHEAD' : 'BELOW HORIZON'}
                       </span>
                     </div>
-
                     <div className="grid grid-cols-2 gap-x-8 gap-y-3.5 text-[15.5px]">
                       <div className="flex flex-col">
                         <span className="text-cyan-400 font-black tracking-widest text-[11.5px]">ORIGIN / OPERATOR</span>
@@ -843,9 +864,7 @@ return (
                       </div>
                       <div className="flex flex-col col-span-2">
                         <span className="text-cyan-400 tracking-widest font-black text-[11.5px]">INTELLIGENCE REPORT</span>
-                        <p className="text-cyan-50/95 leading-relaxed text-[15px] font-medium mt-1">
-                          {satInfo?.description}
-                        </p>
+                        <p className="text-cyan-50/95 leading-relaxed text-[15px] font-medium mt-1">{satInfo?.description}</p>
                       </div>
                     </div>
                   </div>
@@ -859,160 +878,156 @@ return (
           </div>
         </section>
 
-        {/* RIGHT LADDER COMPASS DECK: PLANETARY DEPTH SORTING & PROFILE BOXES */}
+        {/* RIGHT DECK */}
         <section className="xl:col-span-1 flex flex-col gap-4">
           <div className="p-[1.5px] bg-gradient-to-br from-cyan-500/30 to-cyan-500/10 clip-chamfer shadow-lg relative h-full flex flex-col">
             <div className="clip-chamfer bg-black/12 backdrop-blur-sm p-3 shadow-lg flex flex-col h-full w-full">
-            <div className="flex items-center justify-between border-b border-cyan-500/20 pb-2 mb-3 text-cyan-400 font-black tracking-widest text-[10px]">
-              <div className="flex items-center gap-2">
-                <Compass size={12} className="animate-pulse" />
-                <span>[06] // PARALLACTIC_DEPTH_LADDER</span>
-              </div>
-              <span className="text-[9px] text-cyan-600/60 font-black">VECTOR_SORT</span>
-            </div>
-
-            {/* COMPACT MATRIX CARD VIEWS */}
-            <div className="flex flex-col gap-2 flex-1 overflow-y-auto pr-1 max-h-[560px] custom-scrollbar">
-              {telemetry?.cosmic_objects
-                ?.filter(obj => !obj.name.includes("ISS") && !obj.name.includes("STARLINK"))
-                ?.sort((a, b) => a.distance_km - b.distance_km)
-                ?.map((obj) => {
-                  const isOverhead = obj.is_visible;
-                  let planetColor = "#22d3ee"; 
-                  if (obj.name === "Moon") planetColor = "#fcd34d";
-                  if (obj.name === "Sun") planetColor = "#f97316";
-                  if (obj.name === "Mars") planetColor = "#ef4444";
-                  if (obj.name === "Jupiter") planetColor = "#e2e8f0";
-                  if (obj.name === "Saturn") planetColor = "#fef08a";
-                  if (obj.name === "Mercury") planetColor = "#94a3b8";
-                  if (obj.name === "Uranus") planetColor = "#38bdf8";
-                  if (obj.name === "Neptune") planetColor = "#6366f1";
-
-                  return (
-                    <div 
-                      key={obj.name}
-                      className={`relative grid grid-cols-4 gap-4 p-3.5 border transition-all duration-300 bg-black/40 items-center h-[136px] ${
-                        isOverhead 
-                          ? 'border-cyan-500/30 shadow-sm shadow-cyan-950/40 bg-gradient-to-r from-cyan-950/10 to-transparent' 
-                          : 'border-slate-900/60 opacity-25'
-                      }`}
-                    >
-                      {/* MINI VIEWPORT MODULE */}
-                      <div className="col-span-1 flex items-center justify-center">
-                        <div className="h-[60px] w-[60px] relative bg-black border border-cyan-900/20 flex items-center justify-center overflow-hidden rounded-sm">
-                          <div className="w-full h-full scale-100">
-                            <OrbitalMiniRender color={planetColor} segments={4} isOverhead={isOverhead} name={obj.name} />
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* TEXT DATA FIELD METRICS */}
-                      <div className="col-span-3 flex flex-col justify-between h-full py-0.5">
-                        <div className="flex justify-between items-center">
-                          <span className={`text-[20px] font-black tracking-widest ${isOverhead ? 'text-gray-200' : 'text-slate-600'}`}>
-                            {obj.name.toUpperCase()}
-                          </span>
-                          <span className={`text-[13px] px-2 py-0.5 font-black border ${
-                            isOverhead 
-                              ? 'bg-cyan-950/60 text-cyan-400 border-cyan-500/30' 
-                              : 'bg-black text-slate-700 border-slate-900'
-                          }`}>
-                            {isOverhead ? 'ACQ' : 'LOS'}
-                          </span>
-                        </div>
-                        
-                        <div className="space-y-1 text-[14px] text-cyan-600/80 font-bold border-t border-cyan-950/40 pt-1.5 mt-1 flex flex-col">
-                          <div className="flex justify-between">
-                            <span>DST:</span>
-                            <span className="text-gray-300 font-black">{Math.round(obj.distance_km).toLocaleString()} KM</span>
-                          </div>
-                          <div className="flex justify-between">
-                            <span>ELV:</span>
-                            <span className={`font-black ${obj.elevation >= 0 ? 'text-emerald-400' : 'text-rose-500'}`}>{obj.elevation.toFixed(1)}°</span>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })}
-            </div>
-
-            {/* ZERO SHADOW MATRIX BLOCK */}
-            <div className="mt-3 pt-3 border-t border-cyan-500/20">
-              <div className="flex items-center justify-between text-cyan-400 text-[15px] font-black tracking-widest mb-2">
-                <span>[07] // ZERO_SHADOW_PROFILE</span>
-                <span className="text-[11.5px] px-2 py-0.5 bg-amber-500/10 text-amber-500 border border-amber-500/20">SUN_CORE</span>
-              </div>
-              <div className="grid grid-cols-3 gap-2.5 items-center bg-black/60 p-4 border border-cyan-900/30 clip-chamfer">
-                <div className="col-span-2 space-y-2 text-[14px] font-bold text-cyan-600">
-                  <div className="flex justify-between"><span>PHASE:</span><span className="text-gray-200 font-black uppercase">{sunPhaseText}</span></div>
-                  <div className="flex justify-between"><span>ELEVATION:</span><span className="text-amber-500 font-black">{sunElevation >= 0 ? `${sunElevation.toFixed(2)}°` : "UNDER HORIZON"}</span></div>
-                  <div className="flex justify-between"><span>SHADOW_RATIO:</span><span className="text-emerald-400 font-black">{shadowRatioText}</span></div>
+              <div className="flex items-center justify-between border-b border-cyan-500/20 pb-2 mb-3 text-cyan-400 font-black tracking-widest text-[10px]">
+                <div className="flex items-center gap-2">
+                  <Compass size={12} className="animate-pulse" />
+                  <Tooltip text={TIPS.distancePhase}>
+                    <span>[06] DISTANCE &amp; PHASE</span>
+                  </Tooltip>
                 </div>
-                <div className="col-span-1 flex items-center justify-center">
-                  <div className={`h-12 w-12 rounded-full bg-gradient-to-tr ${sunElevation > 0 ? 'from-amber-600 to-yellow-400 shadow-md shadow-amber-500/20 animate-pulse' : 'from-slate-800 to-slate-900 opacity-30'}`}></div>
-                </div>
+                <span className="text-[9px] text-cyan-600/60 font-black">VECTOR_SORT</span>
               </div>
-            </div>
 
-            {/* [08] CONJUNCTION THREAT BOARD */}
-            <div className="mt-3 pt-3 border-t border-cyan-500/20 flex-1 flex flex-col min-h-[250px]">
-              <div className="flex items-center justify-between text-cyan-400 text-[17px] font-black tracking-widest mb-2">
-                <span>[08] // CONJUNCTION_THREAT_BOARD</span>
-                <span className="text-[13px] px-2 py-0.5 bg-cyan-950 text-cyan-400 border border-cyan-500/20">LIVE_SCAN</span>
-              </div>
-              
-              <div className="flex-1 bg-black/40 border border-cyan-950 p-4 clip-chamfer flex flex-col justify-center min-h-[180px]">
-                {telemetry?.conjunctions && telemetry.conjunctions.length > 0 ? (
-                  <div className="space-y-2 overflow-y-auto max-h-[190px] custom-scrollbar">
-                    {telemetry.conjunctions.map((threat, idx) => (
-                      <div key={idx} className="flex items-center justify-between border-b border-cyan-950/40 pb-1.5 text-[15px] font-mono">
-                        <div className="flex flex-col">
-                          <span className="text-gray-200 font-bold">{threat.satellite}</span>
-                          <span className="text-cyan-600/80 text-[12px]">PROXIMITY ALIGN TO {threat.target.toUpperCase()}</span>
+              <div className="flex flex-col gap-2 flex-1 overflow-y-auto pr-1 max-h-[560px] custom-scrollbar">
+                {telemetry?.cosmic_objects
+                  ?.filter(obj => !obj.name.includes("ISS") && !obj.name.includes("STARLINK"))
+                  ?.sort((a, b) => a.distance_km - b.distance_km)
+                  ?.map((obj) => {
+                    const isOverhead = obj.is_visible;
+                    let planetColor = "#22d3ee";
+                    if (obj.name === "Moon") planetColor = "#fcd34d";
+                    if (obj.name === "Sun") planetColor = "#f97316";
+                    if (obj.name === "Mars") planetColor = "#ef4444";
+                    if (obj.name === "Jupiter") planetColor = "#e2e8f0";
+                    if (obj.name === "Saturn") planetColor = "#fef08a";
+                    if (obj.name === "Mercury") planetColor = "#94a3b8";
+                    if (obj.name === "Uranus") planetColor = "#38bdf8";
+                    if (obj.name === "Neptune") planetColor = "#6366f1";
+
+                    return (
+                      <div
+                        key={obj.name}
+                        className={`relative grid grid-cols-4 gap-4 p-3.5 border transition-all duration-300 bg-black/40 items-center h-[136px] ${
+                          isOverhead
+                            ? 'border-cyan-500/30 shadow-sm shadow-cyan-950/40 bg-gradient-to-r from-cyan-950/10 to-transparent'
+                            : 'border-slate-900/60 opacity-25'
+                        }`}
+                      >
+                        <div className="col-span-1 flex items-center justify-center">
+                          <div className="h-[60px] w-[60px] relative bg-black border border-cyan-900/20 flex items-center justify-center overflow-hidden rounded-sm">
+                            <div className="w-full h-full scale-100">
+                              <OrbitalMiniRender color={planetColor} segments={4} isOverhead={isOverhead} name={obj.name} />
+                            </div>
+                          </div>
                         </div>
-                        <div className="text-right flex items-center gap-1.5">
-                          <span className="text-cyan-400 font-black">{threat.separation}° SEP</span>
-                          <span className={`px-2 py-0.5 text-[12px] font-black rounded-sm border ${
-                            threat.severity === 'CRITICAL' 
-                              ? 'bg-rose-950/60 text-rose-400 border-rose-500/30 animate-pulse' 
-                              : 'bg-amber-950/60 text-amber-500 border-amber-500/30'
-                          }`}>
-                            {threat.severity}
-                          </span>
+                        <div className="col-span-3 flex flex-col justify-between h-full py-0.5">
+                          <div className="flex justify-between items-center">
+                            <span className={`text-[20px] font-black tracking-widest ${isOverhead ? 'text-gray-200' : 'text-slate-600'}`}>
+                              {obj.name.toUpperCase()}
+                            </span>
+                            <span className={`text-[13px] px-2 py-0.5 font-black border ${
+                              isOverhead
+                                ? 'bg-cyan-950/60 text-cyan-400 border-cyan-500/30'
+                                : 'bg-black text-slate-700 border-slate-900'
+                            }`}>
+                              {isOverhead ? 'ACQ' : 'LOS'}
+                            </span>
+                          </div>
+                          <div className="space-y-1 text-[14px] text-cyan-600/80 font-bold border-t border-cyan-950/40 pt-1.5 mt-1 flex flex-col">
+                            <div className="flex justify-between">
+                              <span>DST:</span>
+                              <span className="text-gray-300 font-black">{Math.round(obj.distance_km).toLocaleString()} KM</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span>ELV:</span>
+                              <span className={`font-black ${obj.elevation >= 0 ? 'text-emerald-400' : 'text-rose-500'}`}>{obj.elevation.toFixed(1)}°</span>
+                            </div>
+                          </div>
                         </div>
                       </div>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="flex flex-col items-center justify-center space-y-4 py-1">
-                    <div className="grid grid-cols-3 gap-2 w-full px-1 text-[14px] font-mono text-cyan-500/80">
-                      <div className="border border-cyan-900/30 p-1.5 flex justify-between bg-black/20"><span>SEC 01:</span><span className="text-emerald-400 font-bold">NOMINAL</span></div>
-                      <div className="border border-cyan-900/30 p-1.5 flex justify-between bg-black/20"><span>SEC 02:</span><span className="text-emerald-400 font-bold">NOMINAL</span></div>
-                      <div className="border border-cyan-900/30 p-1.5 flex justify-between bg-black/20"><span>SEC 03:</span><span className="text-emerald-400 font-bold">NOMINAL</span></div>
-                      <div className="border border-cyan-900/30 p-1.5 flex justify-between bg-black/20"><span>SEC 04:</span><span className="text-emerald-400 font-bold">NOMINAL</span></div>
-                      <div className="border border-cyan-900/30 p-1.5 flex justify-between bg-black/20"><span>SEC 05:</span><span className="text-emerald-400 font-bold">NOMINAL</span></div>
-                      <div className="border border-cyan-900/30 p-1.5 flex justify-between bg-black/20"><span>SEC 06:</span><span className="text-emerald-400 font-bold">NOMINAL</span></div>
-                      <div className="border border-cyan-900/30 p-1.5 flex justify-between bg-black/20"><span>SEC 07:</span><span className="text-emerald-400 font-bold">NOMINAL</span></div>
-                      <div className="border border-cyan-900/30 p-1.5 flex justify-between bg-black/20"><span>SEC 08:</span><span className="text-emerald-400 font-bold">NOMINAL</span></div>
-                      <div className="border border-cyan-900/30 p-1.5 flex justify-between bg-black/20"><span>SEC 09:</span><span className="text-emerald-400 font-bold">NOMINAL</span></div>
-                    </div>
-                    
-                    <div className="flex flex-col items-center justify-center text-center space-y-1">
-                      <span className="text-cyan-400 font-black tracking-widest text-[17px] animate-pulse">
-                        // RADAR SCANNING SECTORS 01-09
-                      </span>
-                      <span className="text-emerald-400 font-bold text-[14.5px]">
-                        SYSTEM STATUS NOMINAL // NO ACTIVE PROXIMITY EVENTS
-                      </span>
-                    </div>
-                  </div>
-                )}
+                    );
+                  })}
               </div>
+
+              {/* [07] SUN & SHADOW */}
+              <div className="mt-3 pt-3 border-t border-cyan-500/20">
+                <div className="flex items-center justify-between text-cyan-400 text-[15px] font-black tracking-widest mb-2">
+                  <Tooltip text={TIPS.sunShadow}>
+                    <span>[07] SUN &amp; SHADOW</span>
+                  </Tooltip>
+                  <span className="text-[11.5px] px-2 py-0.5 bg-amber-500/10 text-amber-500 border border-amber-500/20">SUN_CORE</span>
+                </div>
+                <div className="grid grid-cols-3 gap-2.5 items-center bg-black/60 p-4 border border-cyan-900/30 clip-chamfer">
+                  <div className="col-span-2 space-y-2 text-[14px] font-bold text-cyan-600">
+                    <div className="flex justify-between"><span>PHASE:</span><span className="text-gray-200 font-black uppercase">{sunPhaseText}</span></div>
+                    <div className="flex justify-between"><span>ELEVATION:</span><span className="text-amber-500 font-black">{sunElevation >= 0 ? `${sunElevation.toFixed(2)}°` : "UNDER HORIZON"}</span></div>
+                    <div className="flex justify-between"><span>SHADOW_RATIO:</span><span className="text-emerald-400 font-black">{shadowRatioText}</span></div>
+                  </div>
+                  <div className="col-span-1 flex items-center justify-center">
+                    <div className={`h-12 w-12 rounded-full bg-gradient-to-tr ${sunElevation > 0 ? 'from-amber-600 to-yellow-400 shadow-md shadow-amber-500/20 animate-pulse' : 'from-slate-800 to-slate-900 opacity-30'}`}></div>
+                  </div>
+                </div>
+              </div>
+
+              {/* [08] CONJUNCTION ALERTS */}
+              <div className="mt-3 pt-3 border-t border-cyan-500/20 flex-1 flex flex-col min-h-[250px]">
+                <div className="flex items-center justify-between text-cyan-400 text-[17px] font-black tracking-widest mb-2">
+                  <Tooltip text={TIPS.conjunctionAlerts}>
+                    <span>[08] CONJUNCTION ALERTS</span>
+                  </Tooltip>
+                  <span className="text-[13px] px-2 py-0.5 bg-cyan-950 text-cyan-400 border border-cyan-500/20">LIVE_SCAN</span>
+                </div>
+                <div className="flex-1 bg-black/40 border border-cyan-950 p-4 clip-chamfer flex flex-col justify-center min-h-[180px]">
+                  {telemetry?.conjunctions && telemetry.conjunctions.length > 0 ? (
+                    <div className="space-y-2 overflow-y-auto max-h-[190px] custom-scrollbar">
+                      {telemetry.conjunctions.map((threat, idx) => (
+                        <div key={idx} className="flex items-center justify-between border-b border-cyan-950/40 pb-1.5 text-[15px] font-mono">
+                          <div className="flex flex-col">
+                            <span className="text-gray-200 font-bold">{threat.satellite}</span>
+                            <span className="text-cyan-600/80 text-[12px]">PROXIMITY ALIGN TO {threat.target.toUpperCase()}</span>
+                          </div>
+                          <div className="text-right flex items-center gap-1.5">
+                            <span className="text-cyan-400 font-black">{threat.separation}° SEP</span>
+                            <span className={`px-2 py-0.5 text-[12px] font-black rounded-sm border ${
+                              threat.severity === 'CRITICAL'
+                                ? 'bg-rose-950/60 text-rose-400 border-rose-500/30 animate-pulse'
+                                : 'bg-amber-950/60 text-amber-500 border-amber-500/30'
+                            }`}>
+                              {threat.severity}
+                            </span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="flex flex-col items-center justify-center space-y-4 py-1">
+                      <div className="grid grid-cols-3 gap-2 w-full px-1 text-[14px] font-mono text-cyan-500/80">
+                        <div className="border border-cyan-900/30 p-1.5 flex justify-between bg-black/20"><span>SEC 01:</span><span className="text-emerald-400 font-bold">NOMINAL</span></div>
+                        <div className="border border-cyan-900/30 p-1.5 flex justify-between bg-black/20"><span>SEC 02:</span><span className="text-emerald-400 font-bold">NOMINAL</span></div>
+                        <div className="border border-cyan-900/30 p-1.5 flex justify-between bg-black/20"><span>SEC 03:</span><span className="text-emerald-400 font-bold">NOMINAL</span></div>
+                        <div className="border border-cyan-900/30 p-1.5 flex justify-between bg-black/20"><span>SEC 04:</span><span className="text-emerald-400 font-bold">NOMINAL</span></div>
+                        <div className="border border-cyan-900/30 p-1.5 flex justify-between bg-black/20"><span>SEC 05:</span><span className="text-emerald-400 font-bold">NOMINAL</span></div>
+                        <div className="border border-cyan-900/30 p-1.5 flex justify-between bg-black/20"><span>SEC 06:</span><span className="text-emerald-400 font-bold">NOMINAL</span></div>
+                        <div className="border border-cyan-900/30 p-1.5 flex justify-between bg-black/20"><span>SEC 07:</span><span className="text-emerald-400 font-bold">NOMINAL</span></div>
+                        <div className="border border-cyan-900/30 p-1.5 flex justify-between bg-black/20"><span>SEC 08:</span><span className="text-emerald-400 font-bold">NOMINAL</span></div>
+                        <div className="border border-cyan-900/30 p-1.5 flex justify-between bg-black/20"><span>SEC 09:</span><span className="text-emerald-400 font-bold">NOMINAL</span></div>
+                      </div>
+                      <div className="flex flex-col items-center justify-center text-center space-y-1">
+                        <span className="text-cyan-400 font-black tracking-widest text-[17px] animate-pulse">// RADAR SCANNING SECTORS 01-09</span>
+                        <span className="text-emerald-400 font-bold text-[14.5px]">SYSTEM STATUS NOMINAL // NO ACTIVE PROXIMITY EVENTS</span>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+
             </div>
           </div>
-        </div>
-      </section>
+        </section>
 
       </main>
     </div>
