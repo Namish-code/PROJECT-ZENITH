@@ -202,31 +202,44 @@ function RealisticCelestialBody({ obj, projectionMode, isSelected, onSelect }) {
         </mesh>
 
         {/* 3. Persistent name labels & Hover Diagnostic Cards */}
-        {isSatellite && (isHovered || obj.name.toUpperCase().includes("ISS") || obj.name.toUpperCase().includes("TIANGONG") || obj.name.toUpperCase().includes("CSS")) && (
-          <Html distanceFactor={8} position={[0, 0.2, 0]} pointerEvents="none">
-            <div className="flex flex-col items-center font-mono select-none">
-              <div 
-                className="px-2 py-1 text-[11px] font-black tracking-widest bg-black/80 border rounded-sm whitespace-nowrap"
-                style={{ borderColor: fallbackColor, color: fallbackColor }}
-              >
-                {obj.name.toUpperCase()}
-              </div>
+        {(() => {
+          if (!isSatellite) return null;
+          const showLabel = isHovered || obj.name.toUpperCase().includes("ISS") || obj.name.toUpperCase().includes("TIANGONG") || obj.name.toUpperCase().includes("CSS");
+          if (!showLabel) return null;
 
-              {isHovered && (
+          const horizontalDist = Math.sqrt(x * x + z * z);
+          // If satellite is near the circular boundary, shift the tooltip inward
+          const offsetAmt = horizontalDist > 1.2 ? 0.55 : 0.0;
+          const dirX = -x / (horizontalDist || 1);
+          const dirZ = -z / (horizontalDist || 1);
+          const htmlPosition = [dirX * offsetAmt, 0.25, dirZ * offsetAmt];
+
+          return (
+            <Html center position={htmlPosition} pointerEvents="none">
+              <div className="flex flex-col items-center font-mono select-none">
                 <div 
-                  className="mt-1.5 p-2 bg-[#060a12]/95 border text-[10px] leading-tight space-y-1 rounded-sm shadow-lg shadow-black w-32 text-gray-300"
-                  style={{ borderColor: fallbackColor }}
+                  className="px-2 py-1 text-[11px] font-black tracking-widest bg-black/80 border rounded-sm whitespace-nowrap"
+                  style={{ borderColor: fallbackColor, color: fallbackColor }}
                 >
-                  <div className="font-black text-white border-b border-cyan-500/20 pb-0.5 mb-1 text-[11px]">TELEMETRY LOCK</div>
-                  <div>ALT: <span className="text-white font-bold">{Math.round(obj.altitude_km)}KM</span></div>
-                  <div>VEL: <span className="text-white font-bold">{obj.velocity_kms.toFixed(2)}KMS</span></div>
-                  <div>RNG: <span className="text-white font-bold">{Math.round(obj.distance_km)}KM</span></div>
-                  <div>ELV: <span className="text-white font-bold">{obj.elevation.toFixed(1)}°</span></div>
+                  {obj.name.toUpperCase()}
                 </div>
-              )}
-            </div>
-          </Html>
-        )}
+
+                {isHovered && (
+                  <div 
+                    className="mt-1.5 p-2 bg-[#060a12]/95 border text-[10px] leading-tight space-y-1 rounded-sm shadow-lg shadow-black w-32 text-gray-300"
+                    style={{ borderColor: fallbackColor }}
+                  >
+                    <div className="font-black text-white border-b border-cyan-500/20 pb-0.5 mb-1 text-[11px]">TELEMETRY LOCK</div>
+                    <div>ALT: <span className="text-white font-bold">{Math.round(obj.altitude_km)}KM</span></div>
+                    <div>VEL: <span className="text-white font-bold">{obj.velocity_kms.toFixed(2)}KMS</span></div>
+                    <div>RNG: <span className="text-white font-bold">{Math.round(obj.distance_km)}KM</span></div>
+                    <div>ELV: <span className="text-white font-bold">{obj.elevation.toFixed(1)}°</span></div>
+                  </div>
+                )}
+              </div>
+            </Html>
+          );
+        })()}
       </group>
     </group>
   );
