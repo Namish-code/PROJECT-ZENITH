@@ -85,7 +85,7 @@ function OrbitalMiniRender({ color, segments, isOverhead, name }) {
         {loadedTexture ? (
           <meshStandardMaterial 
             map={loadedTexture} 
-            color={color}
+            color="#ffffff"
             roughness={0.6} 
             metalness={0.1}
             opacity={isOverhead ? 1 : 0.25} 
@@ -470,7 +470,7 @@ const TIPS = {
 
 // --- MAIN MASTER COMMAND CONTROL DECK ---
 export default function App() {
-  const [coords, setCoords] = useState({ lat: 40.7128, lon: -74.0060 });
+  const [coords, setCoords] = useState({ lat: 28.53, lon: 77.39 });
   const [showIntro, setShowIntro] = useState(true);
 
   const { lat: LAT, lon: LON } = coords;

@@ -1,5 +1,17 @@
 @import "tailwindcss";
 
+@theme {
+  --font-sans: 'Inter', sans-serif;
+  --font-mono: 'Share Tech Mono', monospace;
+  --font-orbitron: 'Orbitron', sans-serif;
+}
+
+@layer base {
+  body {
+    font-family: 'Inter', sans-serif;
+  }
+}
+
 @layer utilities {
   /* Hard-coding the dark background directly behind the gradient line layers */
   .bg-scanlines {
@@ -59,5 +71,13 @@
     box-shadow: 0 0 8px #06b6d4;
     cursor: pointer;
     border-radius: 1.5px;
+  }
+  input[type="range"].custom-range-slider::-webkit-slider-runnable-track {
+    background: transparent !important;
+    border: none !important;
+  }
+  input[type="range"].custom-range-slider::-moz-range-track {
+    background: transparent !important;
+    border: none !important;
   }
 }
