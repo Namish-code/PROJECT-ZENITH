@@ -1,5 +1,7 @@
 # PROJECT ZENITH: Real-Time Satellite & Planetary Tracking System
 
+### 🌐 Site is Live: **[Click Here](https://project-zenith-h9mc.onrender.com/)**
+
 Project Zenith is a high-fidelity, interactive aerospace tracking terminal designed to monitor satellite trajectories, ground station sector passes, and celestial body configurations in real-time. Built using a dual-deck split-view HUD architecture, the application overlays live telemetry computations on a 3D hemispherical sky dome to calculate relative azimuth, elevation, parallactic distance, and conjunction alerts relative to Noida Ground Station (preset) or custom coordinates.
 
 ---
