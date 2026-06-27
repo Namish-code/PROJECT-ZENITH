@@ -350,6 +350,158 @@ function getSatelliteSummary(name) {
       description: "Core module of the Tiangong space station. Serves as the primary control center and living quarters for taikonauts conducting long-duration aerospace scientific experiments."
     };
   }
+  if (n.includes("HUBBLE") || n.includes("HST")) {
+    return {
+      origin: "USA (NASA / ESA)",
+      purpose: "ASTRONOMICAL OBSERVATORY",
+      launched: "1990-04-24",
+      description: "The Hubble Space Telescope. One of the greatest space observatories, providing high-resolution deep-space imaging across ultraviolet, visible, and near-infrared spectrums."
+    };
+  }
+  if (n.includes("SWIFT")) {
+    return {
+      origin: "USA (NASA / Penn State / UK / Italy)",
+      purpose: "GAMMA-RAY BURST OBSERVATORY",
+      launched: "2004-11-20",
+      description: "Swift Gamma-Ray Burst Mission. Scans the universe for extremely energetic cosmic explosions, studying black hole formations and relativistic jets in real-time."
+    };
+  }
+  if (n.includes("FERMI") || n.includes("GLAST")) {
+    return {
+      origin: "USA (NASA / DOE / International)",
+      purpose: "GAMMA-RAY SPACE TELESCOPE",
+      launched: "2008-06-11",
+      description: "The Fermi Gamma-ray Space Telescope. Explores the high-energy universe, monitoring active galaxies, pulsars, supernova remnants, and dark matter signatures."
+    };
+  }
+  if (n.includes("NOAA")) {
+    return {
+      origin: "USA (NOAA / NASA)",
+      purpose: "METEOROLOGICAL REMOTE SENSING",
+      launched: "POLAR ORBITERS",
+      description: "Polar-orbiting environmental weather satellite. Gathers continuous atmospheric soundings, ocean temperatures, and cloud profiling data for global weather prediction models."
+    };
+  }
+  if (n.includes("METOP")) {
+    return {
+      origin: "EUROPE (ESA / EUMETSAT)",
+      purpose: "METEOROLOGICAL REMOTE SENSING",
+      launched: "EUMETSAT SERIES",
+      description: "Meteorological Operational satellite. Provides high-resolution global monitoring of atmospheric profiles, soil moisture, and greenhouse gases for advanced weather forecasting."
+    };
+  }
+  if (n.includes("SUOMI")) {
+    return {
+      origin: "USA (NASA / NOAA)",
+      purpose: "CLIMATE & EARTH OBSERVATION",
+      launched: "2011-10-28",
+      description: "Suomi National Polar-orbiting Partnership. Bridges old and new climate sensors to track global sea levels, land use, vegetation health, and ozone layer thickness."
+    };
+  }
+  if (n.includes("SARAL")) {
+    return {
+      origin: "INDIA / FRANCE (ISRO / CNES)",
+      purpose: "OCEANOGRAPHIC ALTIMETRY",
+      launched: "2013-02-25",
+      description: "Satellite with ARgos and ALtiKa. Uses high-precision Ka-band radar altimetry to monitor ocean currents, sea level anomalies, wave heights, and continental ice sheets."
+    };
+  }
+  if (n.includes("LANDSAT")) {
+    return {
+      origin: "USA (NASA / USGS)",
+      purpose: "LAND USE REMOTE SENSING",
+      launched: "CIVILIAN IMAGING",
+      description: "Part of the longest-running Earth imaging program. Captures high-resolution multispectral records of Earth's land cover to support forestry, agriculture, and geology."
+    };
+  }
+  if (n.includes("SENTINEL")) {
+    return {
+      origin: "EUROPE (ESA / COPERNICUS)",
+      purpose: "C-BAND RADAR IMAGING (SAR)",
+      launched: "2014-04-03",
+      description: "Sentinel-1 Synthetic Aperture Radar satellite. Delivers continuous, all-weather day-and-night radar mapping of terrestrial terrains and maritime shipping routes."
+    };
+  }
+  if (n.includes("ENVISAT")) {
+    return {
+      origin: "EUROPE (ESA)",
+      purpose: "ENVIRONMENTAL SCIENCE (DEBRIS)",
+      launched: "2002-03-01",
+      description: "Pioneering environmental satellite that monitored ocean temperatures, atmospheric chemistry, and ice sheets. Currently retired and tracked as a high-risk space debris target."
+    };
+  }
+  if (n.includes("TERRA")) {
+    return {
+      origin: "USA (NASA)",
+      purpose: "CLIMATE REMOTE SENSING",
+      launched: "1999-12-18",
+      description: "NASA's flagship Earth Observing System (EOS) platform. Coordinates multiple instruments to monitor air pollution, land temperatures, and global carbon cycles."
+    };
+  }
+  if (n.includes("AQUA")) {
+    return {
+      origin: "USA (NASA)",
+      purpose: "HYDROL-CYCLE OBSERVATION",
+      launched: "2002-05-04",
+      description: "Earth Observing System (EOS) oceanographic payload. Specialized in monitoring water vapor, global precipitation, clouds, sea ice, and ocean color variables."
+    };
+  }
+  if (n.includes("AURA")) {
+    return {
+      origin: "USA (NASA)",
+      purpose: "ATMOSPHERIC COMPOSITION",
+      launched: "2004-07-15",
+      description: "EOS atmospheric observatory. Dedicated to tracking Earth's ozone layer health, air quality changes, greenhouse gas profiles, and atmospheric moisture currents."
+    };
+  }
+  if (n.includes("CALIPSO")) {
+    return {
+      origin: "USA / FRANCE (NASA / CNES)",
+      purpose: "CLOUD & AEROSOL LIDAR",
+      launched: "2006-04-28",
+      description: "Cloud-Aerosol Lidar and Infrared Pathfinder Satellite. Uses active laser sweeps to measure the altitude and optical density of thin clouds and atmospheric dust layers."
+    };
+  }
+  if (n.includes("JASON")) {
+    return {
+      origin: "USA / EUROPE (NOAA/NASA/CNES/EUMETSAT)",
+      purpose: "OCEAN SURFACE ALTIMETRY",
+      launched: "2016-01-17",
+      description: "Jason-3 altimetry satellite. Tracks ocean topography, providing critical sea surface height data to map deep ocean currents and monitor thermal energy changes."
+    };
+  }
+  if (n.includes("CRYOSAT")) {
+    return {
+      origin: "EUROPE (ESA)",
+      purpose: "POLAR ICE THICKNESS RADAR",
+      launched: "2010-04-08",
+      description: "CryoSat-2 ice sheet observation payload. Utilizes interferometric radar sounders to measure glacier height fluctuations and sea ice volume changes."
+    };
+  }
+  if (n.includes("GRACE-FO")) {
+    return {
+      origin: "USA / GERMANY (NASA / GFZ)",
+      purpose: "GRAV-FIELD MAPPING CONSTELLATION",
+      launched: "2018-05-22",
+      description: "Gravity Recovery and Climate Experiment Follow-On. Dual satellites measuring variations in Earth's gravity to map movements of groundwater, soil moisture, and ice sheets."
+    };
+  }
+  if (n.includes("COSMOS") || n.includes("GLONASS")) {
+    return {
+      origin: "RUSSIA (ROSCOSMOS)",
+      purpose: "NAVIGATION / COMMUNICATIONS",
+      launched: "MILITARY NAVIGATION",
+      description: "GLONASS global positioning navigation constellation payload. Broadcasts precise timing and location signals for civilian and aerospace positioning networks."
+    };
+  }
+  if (n.includes("ONEWEB")) {
+    return {
+      origin: "GLOBAL (ONEWEB)",
+      purpose: "BROADBAND CONSTELLATION",
+      launched: "DYNAMIC DEPLOYMENTS",
+      description: "Eutelsat OneWeb low-Earth orbit telecommunication satellite, delivering high-speed, low-latency broadband internet solutions to remote areas globally."
+    };
+  }
   if (n.includes("STARLINK")) {
     return {
       origin: "USA (SPACEX)",
@@ -428,14 +580,6 @@ function getSatelliteSummary(name) {
       purpose: "METEOROLOGICAL REMOTE SENSING",
       launched: "HISTORICAL LAUNCHES",
       description: "Pioneering weather research satellite series. Nimbus satellites tested advanced meteorological sensors, mapping ozone levels, global ice cover, and atmospheric profiles."
-    };
-  }
-  if (n.includes("LANDSAT")) {
-    return {
-      origin: "USA (NASA / USGS)",
-      purpose: "LAND USE REMOTE SENSING",
-      launched: "HISTORICAL LAUNCHES",
-      description: "Part of the longest-running civilian Earth observation program, capturing high-resolution multispectral imagery of Earth's land surfaces for resource management."
     };
   }
   
