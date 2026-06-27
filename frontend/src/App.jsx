@@ -56,6 +56,146 @@ function Tooltip({ text, children, position = "bottom", align = "left" }) {
   );
 }
 // ─────────────────────────────────────────────────────────────────────────────
+function LocationOverrideModal({ onClose, onSelectLocation }) {
+  const [query, setQuery] = useState('');
+  const [status, setStatus] = useState('SYS_READY // AWAITING COMMAND');
+  const [loading, setLoading] = useState(false);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!query) return;
+
+    setLoading(true);
+    setStatus('QUERYING SATELLITE DATABASES...');
+
+    try {
+      const response = await fetch(
+        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}`
+      );
+      const data = await response.json();
+
+      if (data && data.length > 0) {
+        const result = data[0];
+        const lat = parseFloat(result.lat);
+        const lon = parseFloat(result.lon);
+
+        setStatus('RESOLVING REAL-WORLD TIMEZONE...');
+        let timezoneOffset = Math.round((lon / 15.0) * 2) / 2;
+        try {
+          const controller = new AbortController();
+          const timeoutId = setTimeout(() => controller.abort(), 2000);
+          const tzRes = await fetch(
+            `https://timeapi.io/api/timezone/coordinate?latitude={lat}&longitude={lon}`.replace('{lat}', lat).replace('{lon}', lon),
+            { signal: controller.signal }
+          );
+          clearTimeout(timeoutId);
+          if (tzRes.ok) {
+            const tzData = await tzRes.json();
+            if (tzData && tzData.currentUtcOffset) {
+              timezoneOffset = tzData.currentUtcOffset.seconds / 3600;
+            }
+          }
+        } catch (err) {
+          console.warn("Timezone API fallback:", err);
+        }
+
+        setStatus('DOWNLOADING ORBITAL TELEMETRY...');
+        try {
+          const telemetryRes = await fetch(
+            `/api/v1/zenith-telemetry?lat=${lat}&lon=${lon}&time_offset_hours=0`
+          );
+          if (!telemetryRes.ok) throw new Error("Telemetry data pipeline dropped.");
+          const telemetryData = await telemetryRes.json();
+
+          setStatus('COORDINATES LOCKED. COMMENCING DATA SYNC...');
+          setTimeout(() => {
+            onSelectLocation({
+              lat,
+              lon,
+              lng: lon,
+              name: result.display_name,
+              timezoneOffset,
+              telemetry: telemetryData
+            });
+          }, 800);
+        } catch (telemetryErr) {
+          setStatus('ERROR: TELEMETRY DOWNLOAD FAILED.');
+          setLoading(false);
+        }
+      } else {
+        setStatus('ERROR: LOCATION NOT FOUND.');
+        setLoading(false);
+      }
+    } catch (err) {
+      setStatus('ERROR: UPLINK CONNECTION FAILED.');
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-[#020408]/85 backdrop-blur-md">
+      <div className="w-[480px] bg-[#030914]/98 border border-cyan-500/40 p-6 rounded-sm shadow-2xl relative clip-chamfer flex flex-col gap-4">
+        {/* vertical neon accent line */}
+        <div className="absolute left-0 top-0 bottom-0 w-[2px] bg-cyan-500 shadow-[0_0_8px_rgba(6,182,212,0.6)]" />
+        
+        {/* Header */}
+        <div className="flex justify-between items-center border-b border-cyan-500/20 pb-3 text-cyan-400 font-black tracking-widest text-[14px]">
+          <span>// COGNITIVE OVERRIDE: TARGET STATION</span>
+          <button 
+            type="button"
+            onClick={onClose} 
+            disabled={loading}
+            className="text-rose-500 hover:text-rose-400 disabled:opacity-30 transition-colors font-bold text-xs select-none cursor-pointer"
+          >
+            [CLOSE]
+          </button>
+        </div>
+
+        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+          <div className="flex flex-col gap-1">
+            <label className="text-cyan-500/70 font-mono text-[9px] tracking-widest uppercase font-bold pl-0.5">
+              Enter City Name / Coordinates
+            </label>
+            <input 
+              type="text" 
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              disabled={loading}
+              placeholder="E.G. TOKYO, PARIS, 19.43, -99.13"
+              className="bg-black/60 border border-cyan-900 focus:border-cyan-400 outline-none p-3 text-cyan-300 font-mono text-xs tracking-wider uppercase transition-colors rounded-sm disabled:opacity-50"
+              autoFocus
+            />
+          </div>
+          <button 
+            type="submit"
+            disabled={loading || !query}
+            className={`w-full p-2.5 font-mono text-xs tracking-widest uppercase border transition-all duration-200 ${
+              loading || !query
+                ? 'bg-black/20 border-cyan-950 text-cyan-900 cursor-not-allowed'
+                : 'bg-cyan-950/40 hover:bg-cyan-900 border-cyan-700 text-cyan-400 cursor-pointer'
+            }`}
+          >
+            {loading ? 'SYNCHRONIZING...' : 'OVERRIDE COORDINATES'}
+          </button>
+        </form>
+
+        <div className="flex flex-col gap-2 mt-2">
+          <span className="text-cyan-600/70 font-mono text-[9px] tracking-widest uppercase font-bold pl-0.5">
+            Link status
+          </span>
+          <div className={`p-3 border font-mono text-[11px] tracking-wider leading-relaxed rounded-sm ${
+            status.includes('ERROR') ? 'bg-rose-950/20 border-rose-800 text-rose-400' : 
+            status.includes('LOCKED') ? 'bg-emerald-950/20 border-emerald-800 text-emerald-400' :
+            'bg-cyan-950/20 border-cyan-800/50 text-cyan-400/80'
+          }`}>
+            &gt; {status}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+// ─────────────────────────────────────────────────────────────────────────────
 
 // --- SUB-COMPONENT: ROTATING TEXTURE-MAPPED CELESTIAL DISKS ---
 function OrbitalMiniRender({ color, segments, isOverhead, name }) {
@@ -677,6 +817,7 @@ const TIPS = {
 export default function App() {
   const [coords, setCoords] = useState({ lat: 28.53, lon: 77.39 });
   const [showIntro, setShowIntro] = useState(true);
+  const [showOverrideModal, setShowOverrideModal] = useState(false);
 
   const { lat: LAT, lon: LON } = coords;
 
@@ -693,19 +834,28 @@ export default function App() {
     function updateClocks() {
       const now = new Date();
       const sysTimeStr = now.toLocaleTimeString('en-US', { hour12: false });
-      const utcTime = now.getTime() + now.getTimezoneOffset() * 60000;
-      const targetOffset = getTargetTimezoneOffset(LAT, LON);
-      const targetTime = new Date(utcTime + 3600000 * targetOffset);
-      const locTimeStr = targetTime.toLocaleTimeString('en-US', { hour12: false });
+      const targetOffset = coords.timezoneOffset !== undefined 
+        ? coords.timezoneOffset 
+        : getTargetTimezoneOffset(LAT, LON);
+      const targetTime = new Date(now.getTime() + 3600000 * targetOffset);
+      const locTimeStr = targetTime.toLocaleTimeString('en-US', { hour12: false, timeZone: 'UTC' });
       setClocks({ sysTime: sysTimeStr, locTime: locTimeStr });
     }
     updateClocks();
     const interval = setInterval(updateClocks, 1000);
     return () => clearInterval(interval);
-  }, [LAT, LON]);
+  }, [LAT, LON, coords.timezoneOffset]);
 
   useEffect(() => {
     async function fetchSpaceData(showLoading = true) {
+      if (
+        telemetry &&
+        Math.abs(telemetry.ground_station?.lat - LAT) < 0.001 &&
+        Math.abs(telemetry.ground_station?.lon - LON) < 0.001 &&
+        telemetry.time_offset_applied === timeOffset
+      ) {
+        return;
+      }
       try {
         if (showLoading) setLoading(true);
         const response = await fetch(
@@ -1200,7 +1350,7 @@ export default function App() {
                 COORD: {LAT}° N, {LON}° E
               </div>
             </div>
-            <div className="flex items-center gap-2 text-emerald-400 font-bold">
+            <div className="flex items-center gap-2 text-emerald-400 font-bold shrink-0">
               <span className="inline-block h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
               <span className="tracking-widest">UPLINK_OK</span>
             </div>
@@ -1220,14 +1370,16 @@ export default function App() {
           </div>
         </header>
 
-        {/* VIEW DECK SELECTOR BAR */}
-        <div className="relative z-10 flex justify-center mb-5">
-          <div className="flex flex-col items-center gap-1.5 bg-[#030914]/80 border border-cyan-500/30 p-2 rounded-sm backdrop-blur-md shadow-lg shadow-black/80 w-full max-w-lg">
-            <span className="text-[9px] font-mono tracking-[0.25em] text-cyan-400/80 font-black uppercase">// CONSOLE VIEWPORT MODE SELECTOR</span>
+        {/* VIEW DECK SELECTOR & LOCATION OVERRIDE BAR */}
+        <div className="relative z-10 flex justify-center items-stretch gap-4 mb-5 w-full max-w-3xl mx-auto px-4 lg:px-0">
+          
+          {/* CONSOLE VIEWPORT MODE SELECTOR */}
+          <div className="flex-1 flex flex-col items-center gap-1.5 bg-[#030914]/80 border border-cyan-500/30 p-2 rounded-sm backdrop-blur-md shadow-lg shadow-black/80 min-w-0">
+            <span className="text-[9px] font-mono tracking-[0.25em] text-cyan-400/80 font-black uppercase truncate">// CONSOLE VIEWPORT MODE SELECTOR</span>
             <div className="flex items-center gap-2 bg-black/45 border border-cyan-800/40 p-1 rounded-sm select-none w-full">
               <button
                 onClick={() => setCurrentView('OBSERVER')}
-                className={`flex-1 py-1.5 text-[12px] font-black font-mono tracking-widest rounded-sm transition-all duration-200 border cursor-pointer uppercase text-center ${
+                className={`flex-1 py-1.5 text-[11px] lg:text-[12px] font-black font-mono tracking-widest rounded-sm transition-all duration-200 border cursor-pointer uppercase text-center truncate ${
                   currentView === 'OBSERVER'
                     ? 'bg-cyan-500 text-black border-cyan-400 shadow-[0_0_12px_rgba(6,182,212,0.65)] font-black'
                     : 'bg-transparent border-transparent text-cyan-600 hover:text-cyan-400 hover:bg-cyan-950/15'
@@ -1237,7 +1389,7 @@ export default function App() {
               </button>
               <button
                 onClick={() => setCurrentView('ANALYST')}
-                className={`flex-1 py-1.5 text-[12px] font-black font-mono tracking-widest rounded-sm transition-all duration-200 border cursor-pointer uppercase text-center ${
+                className={`flex-1 py-1.5 text-[11px] lg:text-[12px] font-black font-mono tracking-widest rounded-sm transition-all duration-200 border cursor-pointer uppercase text-center truncate ${
                   currentView === 'ANALYST'
                     ? 'bg-amber-500 text-black border-amber-400 shadow-[0_0_12px_rgba(245,158,11,0.65)] font-black'
                     : 'bg-transparent border-transparent text-amber-600 hover:text-amber-500 hover:bg-amber-950/15'
@@ -1247,6 +1399,21 @@ export default function App() {
               </button>
             </div>
           </div>
+
+          {/* STATION LOCATION OVERRIDE */}
+          <div className="w-[180px] lg:w-[220px] flex flex-col items-center gap-1.5 bg-[#030914]/80 border border-cyan-500/30 p-2 rounded-sm backdrop-blur-md shadow-lg shadow-black/80 shrink-0">
+            <span className="text-[9px] font-mono tracking-[0.25em] text-cyan-400/80 font-black uppercase truncate">// STATION OVERRIDE</span>
+            <div className="flex items-center bg-black/45 border border-cyan-800/40 p-1 rounded-sm select-none w-full">
+              <button
+                type="button"
+                onClick={() => setShowOverrideModal(true)}
+                className="w-full py-1.5 text-[11px] lg:text-[12px] font-black font-mono tracking-widest rounded-sm transition-all duration-200 border cursor-pointer uppercase text-center bg-cyan-950/45 hover:bg-cyan-900 border-cyan-850 hover:border-cyan-400 text-cyan-400 hover:text-cyan-200 hover:shadow-[0_0_12px_rgba(6,182,212,0.45)]"
+              >
+                RE-ROUTE LOC
+              </button>
+            </div>
+          </div>
+
         </div>
 
         {/* 2. CORE MASTER CONTROL LAYOUT MATRIX */}
@@ -1375,6 +1542,18 @@ export default function App() {
           )}
         </main>
       </div>
+      {showOverrideModal && (
+        <LocationOverrideModal 
+          onClose={() => setShowOverrideModal(false)}
+          onSelectLocation={(locData) => {
+            setCoords(locData);
+            if (locData.telemetry) {
+              setTelemetry(locData.telemetry);
+            }
+            setShowOverrideModal(false);
+          }}
+        />
+      )}
     </>
   );
 }

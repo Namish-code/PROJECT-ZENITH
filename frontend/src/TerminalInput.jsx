@@ -28,8 +28,26 @@ export default function TerminalInput({ onComplete, framesLoaded }) {
         const result = data[0];
         const lat = parseFloat(result.lat);
         const lon = parseFloat(result.lon);
-        
-        const locData = { lat, lon, lng: lon, name: result.display_name };
+        let timezoneOffset = Math.round((lon / 15.0) * 2) / 2;
+        try {
+          const controller = new AbortController();
+          const timeoutId = setTimeout(() => controller.abort(), 2000);
+          const tzRes = await fetch(
+            `https://timeapi.io/api/timezone/coordinate?latitude=${lat}&longitude=${lon}`,
+            { signal: controller.signal }
+          );
+          clearTimeout(timeoutId);
+          if (tzRes.ok) {
+            const tzData = await tzRes.json();
+            if (tzData && tzData.currentUtcOffset) {
+              timezoneOffset = tzData.currentUtcOffset.seconds / 3600;
+            }
+          }
+        } catch (e) {
+          console.warn("Timezone API fallback:", e);
+        }
+
+        const locData = { lat, lon, lng: lon, name: result.display_name, timezoneOffset };
         setCoords(locData);
         setGlobeData([locData]);
         setStatus(`LOCATION ACQUIRED: ${result.display_name.toUpperCase()}`);
@@ -62,7 +80,7 @@ export default function TerminalInput({ onComplete, framesLoaded }) {
       setIsExiting(true);
       
       setTimeout(() => {
-        onComplete({ lat: coords.lat, lon: coords.lon, lng: coords.lng, name: coords.name });
+        onComplete({ lat: coords.lat, lon: coords.lon, lng: coords.lng, name: coords.name, timezoneOffset: coords.timezoneOffset });
       }, 1500);
       
     } catch (err) {

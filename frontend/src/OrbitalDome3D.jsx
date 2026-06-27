@@ -452,31 +452,32 @@ export default function OrbitalDome3D({ telemetry, loading, timeOffset, projecti
         </div>
       </div>
 
-      <Canvas camera={{ position: [0, 2.8, 3.8], fov: 60 }}>
-        <ambientLight intensity={0.8} />
-        <directionalLight position={[5, 3, 5]} intensity={1.5} />
-        
-        <Stars radius={100} depth={50} count={500} factor={4} saturation={0.5} fade speed={0.2} />
+      <div className={`w-full h-full transition-opacity duration-300 ${loading ? 'opacity-40 pointer-events-none' : 'opacity-100'}`}>
+        <Canvas camera={{ position: [0, 2.8, 3.8], fov: 60 }}>
+          <ambientLight intensity={0.8} />
+          <directionalLight position={[5, 3, 5]} intensity={1.5} />
+          
+          <Stars radius={100} depth={50} count={500} factor={4} saturation={0.5} fade speed={0.2} />
 
-        {/* Master Radar Cage Grid */}
-        <mesh>
-          <sphereGeometry args={[2.5, 40, 20, 0, Math.PI * 2, 0, projectionMode === 'FULL' ? Math.PI : Math.PI / 2]} />
-          <meshBasicMaterial color="#0891b2" wireframe transparent opacity={projectionMode === 'FULL' ? 0.05 : 0.1} />
-        </mesh>
+          {/* Master Radar Cage Grid */}
+          <mesh>
+            <sphereGeometry args={[2.5, 40, 20, 0, Math.PI * 2, 0, projectionMode === 'FULL' ? Math.PI : Math.PI / 2]} />
+            <meshBasicMaterial color="#0891b2" wireframe transparent opacity={projectionMode === 'FULL' ? 0.05 : 0.1} />
+          </mesh>
 
-        {/* Render Combined Aerospace Targets (Planets + Human Hardware) */}
-        {!loading && allObjects.map((obj) => {
-          const shouldRender = projectionMode === 'FULL' || obj.is_visible;
-          return shouldRender && (
-            <RealisticCelestialBody 
-              key={`${obj.id ?? obj.name}-${timeOffset}`} 
-              obj={obj} 
-              projectionMode={projectionMode} 
-              isSelected={selectedSatId === obj.id}
-              onSelect={onSelectSatellite}
-            />
-          );
-        })}
+          {/* Render Combined Aerospace Targets (Planets + Human Hardware) */}
+          {allObjects.map((obj) => {
+            const shouldRender = projectionMode === 'FULL' || obj.is_visible;
+            return shouldRender && (
+              <RealisticCelestialBody 
+                key={`${obj.id ?? obj.name}-${timeOffset}`} 
+                obj={obj} 
+                projectionMode={projectionMode} 
+                isSelected={selectedSatId === obj.id}
+                onSelect={onSelectSatellite}
+              />
+            );
+          })}
 
         {/* Noida Base Tracker Station Dot */}
         <mesh position={[0, 0, 0]}>
@@ -508,6 +509,23 @@ export default function OrbitalDome3D({ telemetry, loading, timeOffset, projecti
         />
         <EffectPipeline />
       </Canvas>
+      </div>
+
+      {/* Dynamic Syncing HUD Overlay */}
+      {loading && (
+        <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/20 z-20 pointer-events-none">
+          <div className="flex flex-col items-center gap-2.5 bg-[#030914]/90 border border-cyan-500/40 p-4 rounded-sm shadow-xl backdrop-blur-sm animate-pulse max-w-[280px] text-center">
+            {/* digital loader icon */}
+            <div className="w-5 h-5 border-2 border-cyan-500 border-t-transparent rounded-full animate-spin"></div>
+            <span className="text-[10px] font-mono tracking-[0.2em] text-cyan-400 font-bold uppercase">
+              UPLINK SYNCING
+            </span>
+            <span className="text-[9px] font-mono text-cyan-600 tracking-wider">
+              DOWNLOADING SECTOR TELEMETRY...
+            </span>
+          </div>
+        </div>
+      )}
 
       <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-slate-950/90 border border-cyan-800 text-[10px] px-3 py-1 rounded-full font-mono text-cyan-400 tracking-widest pointer-events-none z-10 select-none uppercase shadow-lg">
         {projectionMode === 'FULL' ? 'FULL SPHERE SCANNING ACTIVE' : 'COMBINED RADAR LAYER ACTIVE'}
