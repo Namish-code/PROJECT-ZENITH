@@ -296,8 +296,11 @@ function RealisticCelestialBody({ obj, projectionMode, isSelected, onSelect }) {
           if (!showLabel) return null;
 
           const horizontalDist = Math.sqrt(x * x + z * z);
-          // If satellite/planet is near the circular boundary, shift the tooltip inward
-          const offsetAmt = horizontalDist > 1.2 ? 0.55 : 0.0;
+          // Shift the tooltip inward toward the center dynamically as it approaches the perimeter
+          let offsetAmt = 0.0;
+          if (horizontalDist > 1.0) {
+            offsetAmt = 0.45 + (horizontalDist - 1.0) * 0.48;
+          }
           const dirX = -x / (horizontalDist || 1);
           const dirZ = -z / (horizontalDist || 1);
           const htmlPosition = [dirX * offsetAmt, 0.25, dirZ * offsetAmt];

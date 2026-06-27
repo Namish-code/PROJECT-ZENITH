@@ -61,9 +61,8 @@ export default function TerminalInput({ onComplete, framesLoaded }) {
       setStatus('LINK ESTABLISHED. COMMENCING SPATIAL JUMP.');
       setIsExiting(true);
       
-      // Animate out for 1.5s, then trigger complete
       setTimeout(() => {
-        onComplete({ lat: coords.lat, lon: coords.lon, lng: coords.lng });
+        onComplete({ lat: coords.lat, lon: coords.lon, lng: coords.lng, name: coords.name });
       }, 1500);
       
     } catch (err) {

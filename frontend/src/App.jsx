@@ -9,8 +9,11 @@ import IntroSequence from './IntroSequence';
 // ─── TOOLTIP COMPONENT ────────────────────────────────────────────────────────
 // Wraps any element. On hover, shows a plain-English explanation above it.
 // Styled to match the existing cyan/dark mission-control aesthetic.
-function Tooltip({ text, children }) {
+function Tooltip({ text, children, position = "bottom", align = "left" }) {
   const [visible, setVisible] = useState(false);
+
+  const horizontalClass = align === "right" ? "right-0" : "left-0";
+  const arrowClass = align === "right" ? "right-6" : "left-6";
 
   return (
     <span
@@ -25,14 +28,20 @@ function Tooltip({ text, children }) {
       
       {visible && (
         <div
-          className="absolute top-full left-0 mt-2.5 z-50 w-72 p-4 bg-[#030914]/98 border border-cyan-500/40 rounded-sm shadow-2xl shadow-black/95 backdrop-blur-md pointer-events-none transition-all duration-200"
+          className={`absolute z-50 w-72 p-4 bg-[#030914]/98 border border-cyan-500/40 rounded-sm shadow-2xl shadow-black/95 backdrop-blur-md pointer-events-none transition-all duration-200 ${horizontalClass} ${
+            position === "top" ? "bottom-full mb-2.5" : "top-full mt-2.5"
+          }`}
           style={{ minWidth: '250px' }}
         >
           {/* vertical neon accent line */}
           <div className="absolute left-0 top-0 bottom-0 w-[2px] bg-cyan-500 shadow-[0_0_8px_rgba(6,182,212,0.6)]" />
           
-          {/* upward arrow at the top connecting to the label */}
-          <div className="absolute bottom-full left-6 w-0 h-0 border-l-4 border-r-4 border-b-4 border-l-transparent border-r-transparent border-b-cyan-500/40" />
+          {/* arrow connecting to the label */}
+          {position === "top" ? (
+            <div className={`absolute top-full w-0 h-0 border-l-4 border-r-4 border-t-4 border-l-transparent border-r-transparent border-t-cyan-500/40 ${arrowClass}`} />
+          ) : (
+            <div className={`absolute bottom-full w-0 h-0 border-l-4 border-r-4 border-b-4 border-l-transparent border-r-transparent border-b-cyan-500/40 ${arrowClass}`} />
+          )}
           
           {/* telemetry title */}
           <p className="text-[11px] font-black text-cyan-400 tracking-widest uppercase mb-1.5 select-none font-mono pl-1">// SYSTEM INSTRUMENT BRIEF</p>
@@ -651,6 +660,16 @@ const TIPS = {
       Runs <span className="text-rose-400 font-bold font-mono">proximity algorithms</span> between active LEO assets and background planetary bodies, alerting operator to coordinate overlaps and <span className="text-red-500 font-black animate-pulse">threat vector alignments</span>.
     </>
   ),
+  timeMachineOffset: (
+    <>
+      Displays the active <span className="text-cyan-400 font-bold">chronological offset</span> relative to the system epoch. <span className="text-emerald-400 font-bold">LIVE_SYNCHRONOUS</span> indicates zero-drift synchronization with atomic telemetry.
+    </>
+  ),
+  targetIntel: (
+    <>
+      Aggregates deep-space <span className="text-cyan-400 font-bold">spacecraft intelligence</span>. Displays registry profiles, launcher origins, transit history, and active <span className="text-amber-400 font-bold">orbital state vectors</span>.
+    </>
+  ),
 };
 // ─────────────────────────────────────────────────────────────────────────────
 
@@ -895,7 +914,9 @@ export default function App() {
         <div className="flex items-center justify-between border-b border-cyan-500/20 pb-3 mb-4.5 text-cyan-400 font-black tracking-widest text-[17px] shrink-0">
           <div className="flex items-center gap-2">
             <Radio size={16} className="animate-pulse text-amber-500" />
-            <span>[05-B] TARGET_INTELLIGENCE_PROFILE</span>
+            <Tooltip text={TIPS.targetIntel}>
+              <span>[05-B] TARGET_INTELLIGENCE_PROFILE</span>
+            </Tooltip>
           </div>
           <span className="text-[13.5px] text-cyan-600/80 font-black">DEEP_SPACE_INTEL</span>
         </div>
@@ -1294,17 +1315,19 @@ export default function App() {
                       <div className="flex justify-between items-center text-[16px] mb-2">
                         <span className="text-cyan-400 flex items-center gap-2 tracking-widest font-black">
                           <Clock size={16} />
-                          <Tooltip text={TIPS.timeMachine}>
+                          <Tooltip text={TIPS.timeMachine} position="top">
                             <span>[05] TIME MACHINE</span>
                           </Tooltip>
                         </span>
-                        <span className="font-bold font-mono px-2.5 py-1 bg-cyan-950 border border-cyan-800 text-cyan-400 rounded-sm text-[13px]">
-                          {timeOffset === 0 ? "LIVE_SYNCHRONOUS" : `T_OFFSET: ${timeOffset > 0 ? '+' : ''}${timeOffset}H`}
-                        </span>
+                        <Tooltip text={TIPS.timeMachineOffset} position="bottom" align="right">
+                          <span className="font-bold font-mono px-2.5 py-1 bg-cyan-950 border border-cyan-800 text-cyan-400 rounded-sm text-[13px] cursor-help">
+                            {timeOffset === 0 ? "LIVE_SYNCHRONOUS" : `T_OFFSET: ${timeOffset > 0 ? '+' : ''}${timeOffset}H`}
+                          </span>
+                        </Tooltip>
                       </div>
-                      <div className="relative w-full h-10 flex items-center mt-2 mb-2">
-                        <div className="absolute inset-0 flex items-center justify-center opacity-85 pointer-events-none">
-                          <svg viewBox="0 0 400 30" className="w-full h-full text-cyan-400 fill-none stroke-current stroke-[2.2]">
+                       <div className="relative w-full h-[32px] flex items-center mt-2 mb-2 border border-cyan-500/20 bg-black/45 rounded-sm px-2">
+                        <div className="absolute inset-x-2 inset-y-0 flex items-center justify-center opacity-85 pointer-events-none">
+                          <svg viewBox="0 0 400 30" className="w-full h-full text-cyan-400 fill-none stroke-current stroke-[2.2]" preserveAspectRatio="none">
                             <path d="M 0 15 Q 100 15 150 15 T 190 15 Q 200 2 210 15 T 220 15 Q 230 28 240 15 T 250 15 T 300 15 T 400 15" />
                             <path d="M 0 15 Q 80 15 140 15 T 180 15 Q 200 5 210 15 T 220 25 T 230 15 Q 250 5 260 15 T 320 15 T 400 15" className="opacity-75" strokeDasharray="3 3" />
                             <path d="M 0 15 Q 100 15 150 15 T 190 15 Q 200 28 210 15 T 220 15 Q 230 2 240 15 T 250 15 T 300 15 T 400 15" className="opacity-70" />
@@ -1317,7 +1340,7 @@ export default function App() {
                           step="0.5"
                           value={timeOffset}
                           onChange={(e) => setTimeOffset(parseFloat(e.target.value))}
-                          className="w-full h-[10px] bg-transparent border border-cyan-500/30 rounded-sm appearance-none cursor-pointer relative z-10 focus:outline-none custom-range-slider"
+                          className="w-full h-full bg-transparent appearance-none cursor-pointer relative z-10 focus:outline-none custom-range-slider"
                         />
                       </div>
                       <div className="flex justify-between text-[13px] font-mono mt-2 px-0.5 font-bold">
