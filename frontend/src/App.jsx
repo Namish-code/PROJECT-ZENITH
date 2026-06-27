@@ -843,7 +843,7 @@ export default function App() {
         <div className="flex items-center gap-2 border-b border-cyan-500/20 pb-2 mb-2 text-cyan-400 font-black tracking-widest text-[16px]">
           <Radio size={14} className="animate-pulse" />
           <Tooltip text={TIPS.liveSkyStory}>
-            <span>[01] LIVE SKY STORY</span>
+            <span>[01] TACTICAL OVERHEAD REPORT</span>
           </Tooltip>
         </div>
         <div className="flex-1 bg-black/8 border border-cyan-900/40 p-3.5 font-mono overflow-y-auto custom-scrollbar">
@@ -864,7 +864,7 @@ export default function App() {
       <div className="clip-chamfer bg-black/12 backdrop-blur-sm p-4 flex flex-col h-full w-full">
         <div className="text-cyan-400 font-black tracking-widest text-[16px] border-b border-cyan-500/20 pb-2 mb-2 flex justify-between items-center">
           <Tooltip text={TIPS.zenithSnapshot}>
-            <span>[02] ZENITH SNAPSHOT</span>
+            <span>[02] ZENITH PASS METRICS</span>
           </Tooltip>
           {activeTransits.length > 0 && (
             <span className="text-[10px] px-1.5 py-0.5 bg-rose-950/80 border border-rose-500 text-rose-400 animate-pulse font-black rounded-sm">
@@ -893,7 +893,7 @@ export default function App() {
         <div className="flex items-center gap-2 border-b border-cyan-500/20 pb-2 mb-2 text-cyan-400 font-black tracking-widest text-[16px]">
           <Orbit size={14} className="text-orange-500 animate-spin" style={{ animationDuration: '6s' }} />
           <Tooltip text={TIPS.satelliteTracker}>
-            <span>[03] SATELLITE TRACKER</span>
+            <span>[03] ACTIVE ORBITAL REGISTRY</span>
           </Tooltip>
         </div>
         <div className="bg-black/40 border border-cyan-900/20 p-2 rounded-sm flex-1 flex flex-col min-h-0">
@@ -915,7 +915,7 @@ export default function App() {
           <div className="flex items-center gap-2">
             <Radio size={16} className="animate-pulse text-amber-500" />
             <Tooltip text={TIPS.targetIntel}>
-              <span>[05-B] TARGET_INTELLIGENCE_PROFILE</span>
+              <span>[05-B] ACQUISITION INTEL ANALYSIS</span>
             </Tooltip>
           </div>
           <span className="text-[13.5px] text-cyan-600/80 font-black">DEEP_SPACE_INTEL</span>
@@ -995,7 +995,7 @@ export default function App() {
           <div className="flex items-center gap-2">
             <Compass size={16} className="animate-pulse" />
             <Tooltip text={TIPS.distancePhase}>
-              <span>[06] DISTANCE &amp; PHASE</span>
+              <span>[06] CELESTIAL RANGE &amp; ILLUMINATION</span>
             </Tooltip>
           </div>
           <span className="text-[9px] text-cyan-600/60 font-black">VECTOR_SORT</span>
@@ -1070,7 +1070,7 @@ export default function App() {
       <div className="clip-chamfer bg-black/60 backdrop-blur-md p-4 flex flex-col w-full h-full justify-between">
         <div className="flex items-center justify-between text-cyan-400 text-[16px] font-black tracking-widest border-b border-cyan-500/20 pb-2 mb-2 shrink-0">
           <Tooltip text={TIPS.sunShadow}>
-            <span>[07] SUN &amp; SHADOW</span>
+            <span>[07] SOLAR ALTITUDE &amp; SHADOW MATRIX</span>
           </Tooltip>
           <span className="text-[11.5px] px-2 py-0.5 bg-amber-500/10 text-amber-500 border border-amber-500/20">SUN_CORE</span>
         </div>
@@ -1093,7 +1093,7 @@ export default function App() {
       <div className="clip-chamfer bg-black/12 backdrop-blur-sm p-4 flex flex-col h-full w-full">
         <div className="flex items-center justify-between text-cyan-400 text-[16px] font-black tracking-widest border-b border-cyan-500/20 pb-2 mb-2 shrink-0">
           <Tooltip text={TIPS.conjunctionAlerts}>
-            <span>[08] CONJUNCTION ALERTS</span>
+            <span>[08] PROXIMITY &amp; CONJUNCTION ALERTS</span>
           </Tooltip>
           <span className="text-[13px] px-2 py-0.5 bg-cyan-950 text-cyan-400 border border-cyan-500/20">LIVE_SCAN</span>
         </div>
@@ -1267,7 +1267,7 @@ export default function App() {
                       <div className="flex items-center gap-2 text-cyan-400 font-black tracking-widest text-[16px]">
                         <Compass size={16} />
                         <Tooltip text={TIPS.overheadRadar}>
-                          <span>{projectionMode === 'FULL' ? '[04] ZENITH_RADAR_SPHERE' : '[04] OVERHEAD RADAR'}</span>
+                          <span>{projectionMode === 'FULL' ? '[04] TACTICAL CELESTIAL SPHERE' : '[04] TACTICAL HORIZON RADAR'}</span>
                         </Tooltip>
                       </div>
                       <div className="flex items-center gap-3">
@@ -1316,7 +1316,7 @@ export default function App() {
                         <span className="text-cyan-400 flex items-center gap-2 tracking-widest font-black">
                           <Clock size={16} />
                           <Tooltip text={TIPS.timeMachine} position="top">
-                            <span>[05] TIME MACHINE</span>
+                            <span>[05] TEMPORAL ORBIT PROPAGATOR</span>
                           </Tooltip>
                         </span>
                         <Tooltip text={TIPS.timeMachineOffset} position="bottom" align="right">
