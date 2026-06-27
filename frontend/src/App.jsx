@@ -14,31 +14,31 @@ function Tooltip({ text, children }) {
 
   return (
     <span
-      className="relative inline-flex items-center"
+      className="relative inline-flex items-center cursor-help group tooltip-trigger transition-all duration-200"
       onMouseEnter={() => setVisible(true)}
       onMouseLeave={() => setVisible(false)}
     >
+      {/* Sliding cyber brackets on hover */}
+      <span className="text-cyan-500 mr-2 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-200 select-none font-mono">►</span>
       {children}
-      {/* small "?" badge with neon hover effect */}
-      <span className="ml-1.5 inline-flex items-center justify-center w-3.5 h-3.5 rounded-full border border-cyan-500/35 text-cyan-500/60 text-[9px] font-black leading-none cursor-help select-none hover:text-cyan-400 hover:border-cyan-400 hover:bg-cyan-500/10 hover:shadow-[0_0_8px_rgba(6,182,212,0.4)] transition-all duration-150">
-        ?
-      </span>
+      <span className="text-cyan-500 ml-2 opacity-0 translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-200 select-none font-mono">◄</span>
+      
       {visible && (
         <div
-          className="absolute top-full left-0 mt-2.5 z-50 w-64 p-3.5 bg-[#030914]/98 border border-cyan-500/40 rounded-sm shadow-xl shadow-black/90 backdrop-blur-md pointer-events-none transition-all duration-150"
-          style={{ minWidth: '230px' }}
+          className="absolute top-full left-0 mt-2.5 z-50 w-72 p-4 bg-[#030914]/98 border border-cyan-500/40 rounded-sm shadow-2xl shadow-black/95 backdrop-blur-md pointer-events-none transition-all duration-200"
+          style={{ minWidth: '250px' }}
         >
           {/* vertical neon accent line */}
           <div className="absolute left-0 top-0 bottom-0 w-[2px] bg-cyan-500 shadow-[0_0_8px_rgba(6,182,212,0.6)]" />
           
           {/* upward arrow at the top connecting to the label */}
-          <div className="absolute bottom-full left-4 w-0 h-0 border-l-4 border-r-4 border-b-4 border-l-transparent border-r-transparent border-b-cyan-500/40" />
+          <div className="absolute bottom-full left-6 w-0 h-0 border-l-4 border-r-4 border-b-4 border-l-transparent border-r-transparent border-b-cyan-500/40" />
           
           {/* telemetry title */}
-          <p className="text-[9px] font-black text-cyan-400 tracking-widest uppercase mb-1.5 select-none font-mono pl-1">// SYSTEM INSTRUMENT BRIEF</p>
+          <p className="text-[11px] font-black text-cyan-400 tracking-widest uppercase mb-1.5 select-none font-mono pl-1">// SYSTEM INSTRUMENT BRIEF</p>
           
           {/* description text */}
-          <p className="text-cyan-50/90 text-[11px] font-sans font-normal leading-relaxed tracking-wide pl-1">
+          <p className="text-cyan-50/90 text-[15px] font-sans font-normal leading-relaxed tracking-wide pl-1">
             {text}
           </p>
         </div>
@@ -611,22 +611,46 @@ function getSatelliteSummary(name) {
 
 // ─── TOOLTIP TEXT DEFINITIONS ─────────────────────────────────────────────────
 const TIPS = {
-  liveSkyStory:
-    "A plain-English description of what's happening in the sky above your chosen location right now — updated live as satellites and planets move.",
-  zenithSnapshot:
-    "A quick summary of the objects currently visible above you: how many, which one is closest, how far away it is, and which direction to look.",
-  satelliteTracker:
-    "A live list of satellites passing through the sky above you. Tap any satellite to see its 3D shape, who built it, and what it's used for.",
-  overheadRadar:
-    "A radar-style map of your sky viewed from above. The centre is directly overhead (your zenith). Objects near the centre are almost straight above you; objects near the edge are low on the horizon.",
-  timeMachine:
-    "Drag the slider left to see the sky as it was up to 24 hours ago, or right to preview what will be overhead up to 24 hours from now.",
-  distancePhase:
-    "Shows every planet, the Moon, and the Sun — how far away each one is and whether it's currently above your horizon or hidden below it.",
-  sunShadow:
-    "Tracks the Sun's angle in your sky. Near the equator, it shows the exact date when the Sun is so directly overhead that objects cast almost no shadow at all.",
-  conjunctionAlerts:
-    "Automatically detects rare moments when two or more space objects (like the ISS and a planet) are nearly overhead at the same time — a special event worth looking up for.",
+  liveSkyStory: (
+    <>
+      Synthesizes <span className="text-cyan-400 font-bold">real-time satellite transits</span> and <span className="text-amber-400 font-bold">planetary alignments</span> into an automated, natural-language <span className="text-emerald-400 font-bold">telemetry report</span> above the observer's horizon.
+    </>
+  ),
+  zenithSnapshot: (
+    <>
+      Computes real-time <span className="text-emerald-400 font-bold">visibility metrics</span> for <span className="text-cyan-400 font-bold">LEO/MEO vessels</span> within the local zenith window, tracking <span className="text-rose-400 font-bold">closest contact range</span> and vector headings.
+    </>
+  ),
+  satelliteTracker: (
+    <>
+      Real-time <span className="text-cyan-400 font-bold">active tracking registry</span>. Integrates active transits with deep-space <span className="text-amber-400 font-bold">payload intelligence profiles</span> and 3D wireframe <span className="text-purple-400 font-bold">mesh schematics</span>.
+    </>
+  ),
+  overheadRadar: (
+    <>
+      Orthographic projection of the local sky hemisphere. Maps <span className="text-cyan-400 font-bold">radial elevation angles</span> (center is zenith) and absolute <span className="text-amber-400 font-bold">azimuthal bearings</span>.
+    </>
+  ),
+  timeMachine: (
+    <>
+      <span className="text-emerald-400 font-bold">Temporally propagates</span> orbital coordinates. Adjust slider to calculate <span className="text-amber-400 font-bold">historical trajectories</span> or project <span className="text-cyan-400 font-bold">future transit pathways</span> (-24h to +24h).
+    </>
+  ),
+  distancePhase: (
+    <>
+      Calculates <span className="text-cyan-400 font-bold">spatial distance vectors</span> (in AU or KM) and real-time <span className="text-amber-400 font-bold">celestial phases</span> relative to the observer's <span className="text-emerald-400 font-bold">horizon plane</span>.
+    </>
+  ),
+  sunShadow: (
+    <>
+      Tracks <span className="text-orange-400 font-bold">solar altitude angles</span> and computes mathematical <span className="text-yellow-400 font-bold">zero-shadow intervals</span> (<span className="text-emerald-400 font-bold">shadow length coefficients</span>) for the active sector.
+    </>
+  ),
+  conjunctionAlerts: (
+    <>
+      Runs <span className="text-rose-400 font-bold font-mono">proximity algorithms</span> between active LEO assets and background planetary bodies, alerting operator to coordinate overlaps and <span className="text-red-500 font-black animate-pulse">threat vector alignments</span>.
+    </>
+  ),
 };
 // ─────────────────────────────────────────────────────────────────────────────
 
@@ -1110,7 +1134,7 @@ export default function App() {
         <div className="absolute inset-0 bg-radial-gradient from-transparent via-[#04060b]/60 to-[#020306] pointer-events-none z-0"></div>
 
         {/* 1. TOP TACTICAL INSTRUMENT BAR */}
-        <header className="relative z-10 border border-cyan-500/30 bg-black/15 backdrop-blur-sm mb-4 rounded-sm shadow-md shadow-black/80 grid grid-cols-1 lg:grid-cols-5 divide-y lg:divide-y-0 lg:divide-x divide-cyan-500/20 text-[13px]">
+        <header className="relative z-10 border border-cyan-500/30 bg-black/15 backdrop-blur-sm mb-4 rounded-sm shadow-md shadow-black/80 grid grid-cols-1 lg:grid-cols-[1fr_2.6fr_1.6fr_0.8fr] divide-y lg:divide-y-0 lg:divide-x divide-cyan-500/20 text-[13px]">
           <div className="p-3.5 flex items-center justify-between bg-cyan-500/5">
             <div className="flex items-center gap-2.5">
               <span className="relative flex h-2 w-2">
@@ -1122,41 +1146,18 @@ export default function App() {
             <span className="text-cyan-600/60 font-bold">LST-4.02</span>
           </div>
 
-          <div className="p-3 bg-cyan-950/5 flex items-center justify-center">
-            <div className="flex items-center gap-1 bg-black/45 border border-cyan-800/40 p-0.5 rounded-sm select-none w-full animate-pulse hover:animate-none">
-              <button
-                onClick={() => setCurrentView('OBSERVER')}
-                className={`flex-1 py-1 text-[11px] font-black font-mono tracking-wider rounded-sm transition-all duration-150 border cursor-pointer uppercase text-center ${
-                  currentView === 'OBSERVER'
-                    ? 'bg-cyan-950/60 border-cyan-500/30 text-cyan-400 shadow-[0_0_8px_rgba(6,182,212,0.15)] font-black'
-                    : 'bg-transparent border-transparent text-cyan-700 hover:text-cyan-500 hover:bg-cyan-950/10'
-                }`}
-              >
-                OBSERVER DECK
-              </button>
-              <button
-                onClick={() => setCurrentView('ANALYST')}
-                className={`flex-1 py-1 text-[11px] font-black font-mono tracking-wider rounded-sm transition-all duration-150 border cursor-pointer uppercase text-center ${
-                  currentView === 'ANALYST'
-                    ? 'bg-cyan-950/60 border-cyan-500/30 text-cyan-400 shadow-[0_0_8px_rgba(6,182,212,0.15)] font-black'
-                    : 'bg-transparent border-transparent text-cyan-700 hover:text-cyan-500 hover:bg-cyan-950/10'
-                }`}
-              >
-                ANALYST DECK
-              </button>
-            </div>
-          </div>
-
           <div className="p-3.5 lg:col-span-1 flex items-center justify-between gap-3 overflow-hidden bg-amber-500/5">
             <div className="flex items-center gap-3 truncate">
               <span className="text-amber-500 font-black tracking-widest shrink-0 animate-pulse">[ALERT_LOG]:</span>
-              <div className="text-amber-300 tracking-wide truncate uppercase font-medium">
+              <div className="text-amber-300 tracking-wide truncate uppercase font-semibold text-[12.5px]">
                 {telemetry?.conjunctions && telemetry.conjunctions.length > 0 ? (
                   <span className="animate-pulse">
-                    !! CRITICAL CONJUNCTION DETECTED !! {telemetry.conjunctions[0].satellite} RANGE APEX TO {telemetry.conjunctions[0].target} // SEP: {telemetry.conjunctions[0].separation}°
+                    ALERT // CRITICAL CONJUNCTION: {telemetry.conjunctions[0].satellite.replace(" (ZARYA)", "")} - {telemetry.conjunctions[0].target.toUpperCase()} ({telemetry.conjunctions[0].separation}°)
                   </span>
+                ) : activeTransits.length > 0 ? (
+                  <span className="text-cyan-400/80 tracking-widest">SYS_ACTIVE // OVERHEAD TRANSIT IN PROGRESS</span>
                 ) : (
-                  <span className="text-cyan-400/70 tracking-widest">SKY_TRACKER_NOMINAL // MONITORING SECTORS 01-09 // PARALLAX CLEAR</span>
+                  <span className="text-cyan-400/80 tracking-widest animate-pulse">SYS_STATUS: ACTIVE // MONITORING SECTORS 01-09 // PARALLAX: CLEAR</span>
                 )}
               </div>
             </div>
@@ -1197,6 +1198,35 @@ export default function App() {
             </div>
           </div>
         </header>
+
+        {/* VIEW DECK SELECTOR BAR */}
+        <div className="relative z-10 flex justify-center mb-5">
+          <div className="flex flex-col items-center gap-1.5 bg-[#030914]/80 border border-cyan-500/30 p-2 rounded-sm backdrop-blur-md shadow-lg shadow-black/80 w-full max-w-lg">
+            <span className="text-[9px] font-mono tracking-[0.25em] text-cyan-400/80 font-black uppercase">// CONSOLE VIEWPORT MODE SELECTOR</span>
+            <div className="flex items-center gap-2 bg-black/45 border border-cyan-800/40 p-1 rounded-sm select-none w-full">
+              <button
+                onClick={() => setCurrentView('OBSERVER')}
+                className={`flex-1 py-1.5 text-[12px] font-black font-mono tracking-widest rounded-sm transition-all duration-200 border cursor-pointer uppercase text-center ${
+                  currentView === 'OBSERVER'
+                    ? 'bg-cyan-500 text-black border-cyan-400 shadow-[0_0_12px_rgba(6,182,212,0.65)] font-black'
+                    : 'bg-transparent border-transparent text-cyan-600 hover:text-cyan-400 hover:bg-cyan-950/15'
+                }`}
+              >
+                OBSERVER DECK
+              </button>
+              <button
+                onClick={() => setCurrentView('ANALYST')}
+                className={`flex-1 py-1.5 text-[12px] font-black font-mono tracking-widest rounded-sm transition-all duration-200 border cursor-pointer uppercase text-center ${
+                  currentView === 'ANALYST'
+                    ? 'bg-amber-500 text-black border-amber-400 shadow-[0_0_12px_rgba(245,158,11,0.65)] font-black'
+                    : 'bg-transparent border-transparent text-amber-600 hover:text-amber-500 hover:bg-amber-950/15'
+                }`}
+              >
+                ANALYST DECK
+              </button>
+            </div>
+          </div>
+        </div>
 
         {/* 2. CORE MASTER CONTROL LAYOUT MATRIX */}
         <main className="relative z-10">
