@@ -10,28 +10,129 @@ Project Zenith is a high-fidelity, interactive aerospace tracking terminal desig
 
 Project Zenith is split into two specialized workspaces designed to organize complex tracking data without clutter:
 
-### 1. The Observer Deck (Visual sky modeling)
-* **[01] Live Sky Story**: A real-time, parsed monospace narrative describing visible passes, planetary events, and conjunction threats with color-coded key tags (e.g., orange for ISS, yellow for the Moon, amber for direction coordinates).
-* **[02] Noida Ground Station Presets**: Displays ground station location data (`GS_LOC: NOIDA, INDIA`), live invisible visible count tracking, coordinates, and closest target range.
-* **[03] LEO Altitude Chamber**: Toggleable visualization of satellite positions arranged by their orbital altitudes (Low Earth Orbit ranges) featuring:
-  * **[03-A] 3D Chamber**: An interactive 3D cylinder projecting satellite heights and sensor sweep cones.
-  * **[03-B] Telemetry Log**: A detailed, scrollable tabular list of NORAD IDs, current visibility status (`ACQ` or `LOS`), and heights.
-* **[04] Zenith Radar Hemisphere (3D Sky Dome)**: 
-  * Displays a full 3D interactive celestial canvas mapping stars, satellites, and planets.
-  * Supports dual-projection modes: **Half Dome** (visible sky mask) and **Full Sphere** (complete orbital path visualizer ghosting targets below the horizon).
-  * Centered on a pulsing Ground Station Sonar ring emitter.
-  * Shows dotted vectorized orbital guides for major celestial bodies (Sun in amber, Moon in yellow).
-* **[05] Time Machine Controls**: A 24-hour chrono-temporal slider backed by a custom SVG oscillator waveform, allowing users to project paths past or future.
-* **[08] Conjunction Alerts Grid**: A real-time threat board showing flashes for active conjunctions and green nominal state checks across Noida's 9 monitored aerospace sectors.
+## 🚀 Website Functionality & Unique Features
 
-### 2. The Analyst Deck (Deep scientific metric logs)
-* **[05-B] Target Intelligence Profile**: Clicking on any satellite in the 3D dome or the LEO list instantly locks a telemetry tracker displaying:
-  * NORAD launch statistics, operators, and mission profiles.
-  * An auto-rotating 3D vector wireframe hologram matching the object's class (e.g., modular space station, flat-panel communications arrays, scientific boxes, or spent cylindrical debris).
-* **[06] Parallactic Depth Ladder**: A height-sorted list of all 9 major celestial bodies mapping their physical distance, elevation, and visibility.
-* **[07] Sun & Shadow Zero-Profile**: Real-time solar transit elevation tracking calculating shadow ratio formula $\cot(\text{elevation})$. Diminishes the Sun indicator when positioned below the horizon.
+Project Zenith is split into two specialized workspaces designed to organize complex tracking data without clutter.
+
+The platform intentionally uses aerospace-inspired tactical naming conventions. For accessibility and educational purposes, every module contains explanatory hover descriptions inside the application interface describing its scientific function and purpose.
+
+### 1. The Observer Deck (Visual Sky Modeling)
+
+* **[01] TACTICAL OVERHEAD REPORT** *(formerly Live Sky Story)*
+
+  A real-time parsed narrative describing visible satellite passes, planetary events, illumination changes, and conjunction threats.
+
+  Educational hover descriptions explain orbital events, visibility conditions, and celestial motion in plain language.
+
+* **[02] ZENITH PASS METRICS** *(formerly Zenith Snapshot)*
+
+  Displays observer telemetry including:
+
+  * coordinates
+  * visible object counts
+  * acquisition statistics
+  * closest tracked target
+  * observer state information
+
+  Hover descriptions provide simplified explanations for educational use.
+
+* **[03] ACTIVE ORBITAL REGISTRY** *(formerly Satellite Tracker)*
+
+  Interactive orbital catalogue displaying tracked objects organized by orbital altitude.
+
+  Includes:
+
+  * **[03-A] Orbital Chamber**
+
+    Interactive 3D cylindrical visualization of orbital positions and sensor sweep cones.
+
+  * **[03-B] Registry Logs**
+
+    Detailed telemetry listing containing:
+
+    * NORAD identifiers
+    * acquisition states
+    * LOS events
+    * altitude measurements
+
+* **[04] TACTICAL HORIZON RADAR / TACTICAL CELESTIAL SPHERE**
+  *(formerly Overhead Radar)*
+
+  Full three-dimensional celestial visualization displaying:
+
+  * satellites
+  * planets
+  * stars
+  * orbital paths
+  * projected trajectories
+
+  Supports:
+
+  * Half Dome mode
+  * Full Sphere mode
+
+  Includes educational overlays describing celestial coordinate systems and object positioning.
+
+* **[05] TEMPORAL ORBIT PROPAGATOR**
+  *(formerly Time Machine)*
+
+  Chrono-temporal control system allowing users to project orbital positions into past and future time windows.
+
+  Uses a 24-hour propagation model with custom SVG timeline controls.
+
+* **[08] PROXIMITY & CONJUNCTION ALERTS**
+  *(formerly Conjunction Alerts)*
+
+  Real-time conjunction monitoring board identifying close angular encounters between tracked satellites and celestial bodies.
+
+  Displays:
+
+  * warnings
+  * critical events
+  * nominal states
 
 ---
+
+### 2. The Analyst Deck (Deep Scientific Metrics)
+
+* **[05-B] ACQUISITION INTEL ANALYSIS**
+  *(formerly Target Intelligence Profile)*
+
+  Selecting an object immediately loads:
+
+  * mission statistics
+  * operators
+  * launch history
+  * classification metadata
+
+  Includes animated object representations corresponding to satellite architecture.
+
+* **[06] CELESTIAL RANGE & ILLUMINATION**
+  *(formerly Distance & Phase)*
+
+  Height-sorted catalogue of celestial bodies displaying:
+
+  * distance
+  * illumination
+  * elevation
+  * phase information
+  * visibility
+
+  Educational overlays explain astronomical concepts for learners.
+
+* **[07] SOLAR ALTITUDE & SHADOW MATRIX**
+  *(formerly Sun & Shadow)*
+
+  Real-time solar transit analysis calculating:
+  $$\cot(\text{elevation})$$
+  to estimate relative shadow ratios and illumination geometry.
+  Intended as an educational demonstration of solar altitude effects and observational astronomy principles.
+
+---
+
+### Educational Accessibility
+Although Project Zenith adopts aerospace-inspired terminology for immersion and interface consistency, all modules provide contextual hover explanations intended for educational purposes, enabling users unfamiliar with orbital mechanics or astronomy to understand the displayed scientific data intuitively.
+
 
 ## 🛠️ Technology Stack & Dependencies
 
