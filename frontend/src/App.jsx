@@ -19,18 +19,26 @@ function Tooltip({ text, children }) {
       onMouseLeave={() => setVisible(false)}
     >
       {children}
-      {/* small "?" badge to signal interactivity */}
-      <span className="ml-1.5 inline-flex items-center justify-center w-3.5 h-3.5 rounded-full border border-cyan-500/40 text-cyan-500/60 text-[8px] font-black leading-none cursor-help select-none">
+      {/* small "?" badge with neon hover effect */}
+      <span className="ml-1.5 inline-flex items-center justify-center w-3.5 h-3.5 rounded-full border border-cyan-500/35 text-cyan-500/60 text-[9px] font-black leading-none cursor-help select-none hover:text-cyan-400 hover:border-cyan-400 hover:bg-cyan-500/10 hover:shadow-[0_0_8px_rgba(6,182,212,0.4)] transition-all duration-150">
         ?
       </span>
       {visible && (
         <div
-          className="absolute top-full left-0 mt-2 z-50 w-64 p-3 bg-[#020d14]/95 border border-cyan-500/30 rounded-sm shadow-xl shadow-black/80 backdrop-blur-sm pointer-events-none"
-          style={{ minWidth: '220px' }}
+          className="absolute top-full left-0 mt-2.5 z-50 w-64 p-3.5 bg-[#030914]/98 border border-cyan-500/40 rounded-sm shadow-xl shadow-black/90 backdrop-blur-md pointer-events-none transition-all duration-150"
+          style={{ minWidth: '230px' }}
         >
-          {/* little arrow */}
-          <div className="absolute top-full left-4 w-0 h-0 border-l-4 border-r-4 border-t-4 border-l-transparent border-r-transparent border-t-cyan-500/30" />
-          <p className="text-cyan-100/90 text-[11px] font-sans font-normal leading-relaxed tracking-normal">
+          {/* vertical neon accent line */}
+          <div className="absolute left-0 top-0 bottom-0 w-[2px] bg-cyan-500 shadow-[0_0_8px_rgba(6,182,212,0.6)]" />
+          
+          {/* upward arrow at the top connecting to the label */}
+          <div className="absolute bottom-full left-4 w-0 h-0 border-l-4 border-r-4 border-b-4 border-l-transparent border-r-transparent border-b-cyan-500/40" />
+          
+          {/* telemetry title */}
+          <p className="text-[9px] font-black text-cyan-400 tracking-widest uppercase mb-1.5 select-none font-mono pl-1">// SYSTEM INSTRUMENT BRIEF</p>
+          
+          {/* description text */}
+          <p className="text-cyan-50/90 text-[11px] font-sans font-normal leading-relaxed tracking-wide pl-1">
             {text}
           </p>
         </div>
@@ -310,7 +318,17 @@ function LiveSignalWaveform() {
 }
 
 // Helper to retrieve user-friendly location name based on coordinates
-function getLocationName(lat, lon) {
+function getLocationName(lat, lon, coordsObj) {
+  if (coordsObj && coordsObj.name) {
+    const parts = coordsObj.name.split(",");
+    const mainName = parts[0].trim().toUpperCase();
+    if (parts.length > 1) {
+      const secondaryName = parts[parts.length - 1].trim().toUpperCase();
+      return `${mainName}, ${secondaryName}`;
+    }
+    return mainName;
+  }
+  
   if (Math.abs(lat - 28.53) < 1 && Math.abs(lon - 77.39) < 1) return "NOIDA, INDIA";
   if (Math.abs(lat - 48.8566) < 1 && Math.abs(lon - 2.3522) < 1) return "PARIS, FRANCE";
   if (Math.abs(lat - 51.5074) < 1 && Math.abs(lon - 0) < 1) return "LONDON, UK";
@@ -1154,7 +1172,7 @@ export default function App() {
             <div className="flex flex-col gap-1 font-bold tracking-wider leading-tight">
               <div className="flex items-center gap-1.5 text-cyan-400 text-[14px]">
                 <Globe size={14} className="text-cyan-400 animate-pulse" />
-                <span>GS_LOC: {getLocationName(LAT, LON)}</span>
+                <span>GS_LOC: {getLocationName(LAT, LON, coords)}</span>
               </div>
               <div className="text-[12px] text-cyan-600/75 ml-[20px]">
                 COORD: {LAT}° N, {LON}° E
